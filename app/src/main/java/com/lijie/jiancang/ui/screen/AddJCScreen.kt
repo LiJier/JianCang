@@ -50,6 +50,7 @@ fun AddJCScreen(addJCViewModel: AddJCViewModel = viewModel(), text: String = "�
 
 @Composable
 fun AddStringContent(addJCViewModel: AddJCViewModel = viewModel(), text: String) {
+    val theme = LocalViewModel.current.themeFlow.value
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -63,13 +64,9 @@ fun AddStringContent(addJCViewModel: AddJCViewModel = viewModel(), text: String)
             },
             modifier = Modifier.fillMaxWidth()
         )
-
         Spacer(modifier = Modifier.height(16.dp))
-
         Text(text = "标签")
-
         Spacer(modifier = Modifier.height(8.dp))
-
         FlowRow(mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
             val label = addJCViewModel.labelFlow.collectAsState()
             label.value.forEach {
@@ -77,18 +74,14 @@ fun AddStringContent(addJCViewModel: AddJCViewModel = viewModel(), text: String)
                     text = it,
                     color = Color.White,
                     modifier = Modifier
-                        .background(Color.Blue, shape = Shapes.small)
+                        .background(theme.primary, shape = Shapes.small)
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
         }
-
         Spacer(modifier = Modifier.height(16.dp))
-
         Text(text = "我的话")
-
         Spacer(modifier = Modifier.height(8.dp))
-
         var my by remember { mutableStateOf("") }
         OutlinedTextField(
             value = my,
