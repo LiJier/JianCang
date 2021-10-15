@@ -15,6 +15,10 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
 import com.lijie.jiancang.ui.theme.JianCangTheme
 
+sealed class Screen(val route: String) {
+    object AddJCScreen : Screen("add_jc_screen")
+}
+
 @Composable
 fun Screen(
     modifier: Modifier = Modifier,
