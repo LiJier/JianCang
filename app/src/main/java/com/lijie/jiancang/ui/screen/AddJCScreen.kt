@@ -71,7 +71,7 @@ fun AddStringContent(addJCViewModel: AddJCViewModel = viewModel(), text: String)
             val label = addJCViewModel.labelFlow.collectAsState()
             label.value.forEach {
                 Text(
-                    text = it,
+                    text = it.name,
                     color = Color.White,
                     modifier = Modifier
                         .background(theme.primary, shape = Shapes.small)

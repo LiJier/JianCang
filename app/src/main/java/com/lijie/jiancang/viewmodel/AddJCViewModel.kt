@@ -1,16 +1,37 @@
 package com.lijie.jiancang.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.lijie.jiancang.db.AppDatabase
+import com.lijie.jiancang.db.entity.Label
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 class AddJCViewModel : ViewModel() {
 
-    val labelFlow =
-        MutableStateFlow(arrayOf("日常", "奇思", "物理", "数学", "文言", "高数", "功勋", "觉醒", "长津湖", "战狼", "电影"))
+    val labelFlow = MutableStateFlow(
+        mutableListOf(
+            Label(name = "预览"),
+            Label(name = "预览"),
+            Label(name = "预览")
+        )
+    )
 
-    fun addLabel(label: String) {
-        val labelArray = labelFlow.value
-        labelFlow.value = labelArray.plus(label)
+    fun queryLabel() {
+        viewModelScope.launch {
+            val labelDao = AppDatabase.db.labelDao()
+            val queryLabel = labelDao.queryLabel()
+            if (queryLabel.isNullOrEmpty()) {
+                labelDao.insert(
+                    arrayListOf(
+                        Label(name = "电影"),
+                        Label(name = "图书"),
+                        Label(name = "歌曲")
+                    )
+                )
+            }
+            labelFlow.value = labelDao.queryLabel().orEmpty().toMutableList()
+        }
     }
 
 }
