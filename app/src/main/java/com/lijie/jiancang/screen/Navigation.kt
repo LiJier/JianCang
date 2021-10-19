@@ -1,4 +1,4 @@
-package com.lijie.jiancang.ui.screen
+package com.lijie.jiancang.screen
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
@@ -24,7 +24,7 @@ val LocalViewModel = staticCompositionLocalOf {
 fun Navigation(
     localViewModel: LocalViewModel = viewModel(),
     navController: NavHostController = rememberAnimatedNavController(),
-    startDestination: String = Screen.AddJCScreen.route,
+    startDestination: String = Screen.AddCollectionScreen.route,
     shareContent: String = ""
 ) {
     CompositionLocalProvider(LocalViewModel provides localViewModel) {
@@ -42,11 +42,11 @@ fun Navigation(
             popExitTransition = { _, _ ->
                 slideOutHorizontally(targetOffsetX = { 1000 })
             }) {
-            composable(route = Screen.AddJCScreen.route) {
-                AddJCScreen(text = shareContent)
+            composable(route = Screen.AddCollectionScreen.route) {
+                AddCollectionScreen(content = shareContent)
             }
-            composable(route = "Main") {
-                Screen()
+            composable(route = Screen.MainScreen.route) {
+                MainScreen()
             }
         }
     }

@@ -1,7 +1,8 @@
-package com.lijie.jiancang.ui.screen
+package com.lijie.jiancang.screen
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -19,16 +20,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.flowlayout.FlowRow
 import com.lijie.jiancang.ext.toast
 import com.lijie.jiancang.ui.theme.Shapes
-import com.lijie.jiancang.viewmodel.AddJCViewModel
+import com.lijie.jiancang.viewmodel.AddCollectionViewModel
 
 @Composable
-fun AddJCScreen(addJCViewModel: AddJCViewModel = viewModel(), text: String = "内容") {
+fun AddCollectionScreen(viewModel: AddCollectionViewModel = viewModel(), content: String = "内容") {
     Screen(topBar = {
+        val onBackPressedDispatcher =
+            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
         TopAppBar(
             title = { Text(text = "添加") },
             navigationIcon = {
-                val onBackPressedDispatcher =
-                    LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
                 IconButton(onClick = {
                     onBackPressedDispatcher?.onBackPressed()
                 }) {
@@ -37,56 +38,80 @@ fun AddJCScreen(addJCViewModel: AddJCViewModel = viewModel(), text: String = "�
             },
             actions = {
                 IconButton(onClick = {
-                    "添加".toast()
+                    viewModel.saveCollection()
                 }) {
                     Icon(Icons.Default.Done, contentDescription = "保存")
+                }
+                val save by viewModel.save.collectAsState()
+                when (save) {
+                    true -> {
+                        "保存成功".toast()
+                        onBackPressedDispatcher?.onBackPressed()
+                    }
+                    false -> {
+                        "保存失败".toast()
+                    }
                 }
             }
         )
     }) {
-        AddStringContent(addJCViewModel, text)
+        viewModel.setContent(content)
+        AddTextCollection(viewModel)
     }
 }
 
 @Composable
-fun AddStringContent(addJCViewModel: AddJCViewModel = viewModel(), text: String) {
+fun AddTextCollection(viewModel: AddCollectionViewModel) {
     val theme = LocalViewModel.current.themeFlow.value
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        var content by remember { mutableStateOf(text) }
+        var content by remember { mutableStateOf(viewModel.content.value) }
         OutlinedTextField(
             value = content,
             onValueChange = { s ->
                 content = s
+                viewModel.setContent(content)
             },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "标签")
         Spacer(modifier = Modifier.height(8.dp))
+        val labelState by viewModel.labels.collectAsState()
         FlowRow(mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
-            val label = addJCViewModel.labelFlow.collectAsState()
-            label.value.forEach {
+            labelState.forEach { label ->
+                var check by remember { mutableStateOf(label.check) }
                 Text(
-                    text = it.name,
+                    text = label.name,
                     color = Color.White,
                     modifier = Modifier
-                        .background(theme.primary, shape = Shapes.small)
+                        .background(
+                            if (check) theme.primaryVariant else theme.primary,
+                            shape = Shapes.small
+                        )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .clickable {
+                            check = check.not()
+                            label.check = check
+                        }
                 )
             }
         }
+        LaunchedEffect(Unit) {
+            viewModel.queryLabel()
+        }
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "我的话")
+        Text(text = "想法")
         Spacer(modifier = Modifier.height(8.dp))
-        var my by remember { mutableStateOf("") }
+        var idea by remember { mutableStateOf(viewModel.idea.value) }
         OutlinedTextField(
-            value = my,
+            value = idea,
             onValueChange = { s ->
-                my = s
+                idea = s
+                viewModel.setIdea(idea)
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -96,6 +121,6 @@ fun AddStringContent(addJCViewModel: AddJCViewModel = viewModel(), text: String)
 
 @Preview
 @Composable
-fun Preview() {
-    AddJCScreen(AddJCViewModel())
+private fun Preview() {
+    AddCollectionScreen(AddCollectionViewModel(true))
 }

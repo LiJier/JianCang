@@ -1,4 +1,4 @@
-package com.lijie.jiancang.ui.screen
+package com.lijie.jiancang.screen
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,7 +16,8 @@ import com.google.accompanist.insets.ui.TopAppBar
 import com.lijie.jiancang.ui.theme.JianCangTheme
 
 sealed class Screen(val route: String) {
-    object AddJCScreen : Screen("add_jc_screen")
+    object AddCollectionScreen : Screen("add_collection_screen")
+    object MainScreen : Screen("main_screen")
 }
 
 @Composable

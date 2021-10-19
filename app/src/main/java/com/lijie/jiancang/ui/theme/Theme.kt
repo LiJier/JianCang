@@ -9,7 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.lijie.jiancang.ui.screen.LocalViewModel
+import com.lijie.jiancang.screen.LocalViewModel
 
 val DarkColorPalette = darkColors(
     primary = Purple200,

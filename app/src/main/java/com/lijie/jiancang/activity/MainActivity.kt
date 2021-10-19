@@ -6,7 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.core.view.WindowCompat
-import com.lijie.jiancang.ui.screen.Navigation
+import com.lijie.jiancang.screen.Navigation
+import com.lijie.jiancang.screen.Screen
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
         }
         if (content.isEmpty()) {
             setContent {
-                Navigation(startDestination = "Main")
+                Navigation(startDestination = Screen.MainScreen.route)
             }
         } else {
             setContent {
