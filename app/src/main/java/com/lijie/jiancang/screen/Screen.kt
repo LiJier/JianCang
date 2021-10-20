@@ -1,29 +1,32 @@
 package com.lijie.jiancang.screen
 
-import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
+import com.lijie.jiancang.ext.URL_TAG
+import com.lijie.jiancang.ext.annotationUrl
 import com.lijie.jiancang.ui.theme.JianCangTheme
 
 sealed class Screen(val route: String) {
@@ -106,49 +109,72 @@ fun TopAppBar(
 }
 
 @Composable
-fun ClickableText(
-    text: AnnotatedString,
+fun AutoLinkText(
+    text: String,
     modifier: Modifier = Modifier,
-    style: TextStyle = TextStyle.Default,
-    softWrap: Boolean = true,
+    color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontStyle: FontStyle? = null,
+    fontWeight: FontWeight? = null,
+    fontFamily: FontFamily? = null,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
+    textDecoration: TextDecoration? = null,
+    textAlign: TextAlign? = null,
+    lineHeight: TextUnit = TextUnit.Unspecified,
     overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    onPress: (Int) -> Unit,
-    onClick: (Int) -> Unit
+    style: TextStyle = LocalTextStyle.current
 ) {
+    val uriHandler = LocalUriHandler.current
+    var annotatedLinkString by remember { mutableStateOf(text.annotationUrl()) }
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    val pressIndicator = Modifier.pointerInput(onClick) {
-        awaitPointerEventScope {
-            val event = awaitPointerEvent()
-            event.changes[0].consumeAllChanges()
-            Log.d("ClickableText", "$event")
-        }
+    val pressIndicator = Modifier.pointerInput(Unit) {
         detectTapGestures(onPress = { pos ->
-            Log.d("ClickableText", "onPress:${layoutResult.value}")
             layoutResult.value?.let { layoutResult ->
-                val p = layoutResult.getOffsetForPosition(pos)
-                onPress(p)
+                val offset = layoutResult.getOffsetForPosition(pos)
+                annotatedLinkString
+                    .getStringAnnotations(URL_TAG, offset, offset)
+                    .firstOrNull()?.let {
+                        annotatedLinkString = text.annotationUrl(offset)
+                    }
             }
+            tryAwaitRelease()
+            annotatedLinkString = text.annotationUrl()
         }) { pos ->
-            Log.d("ClickableText", "onClick:${layoutResult.value}")
             layoutResult.value?.let { layoutResult ->
-                onClick(layoutResult.getOffsetForPosition(pos))
+                val offset = layoutResult.getOffsetForPosition(pos)
+                annotatedLinkString
+                    .getStringAnnotations(URL_TAG, offset, offset)
+                    .firstOrNull()?.let { stringAnnotation ->
+                        annotatedLinkString = text.annotationUrl()
+                        uriHandler.openUri(stringAnnotation.item)
+                    }
             }
         }
     }
-
-    BasicText(
-        text = text,
-        modifier = modifier.then(pressIndicator),
-        style = style,
-        softWrap = softWrap,
-        overflow = overflow,
-        maxLines = maxLines,
-        onTextLayout = {
+    Text(
+        annotatedLinkString,
+        modifier.then(pressIndicator),
+        color,
+        fontSize,
+        fontStyle,
+        fontWeight,
+        fontFamily,
+        letterSpacing,
+        textDecoration,
+        textAlign,
+        lineHeight,
+        overflow,
+        softWrap,
+        maxLines,
+        emptyMap(),
+        {
             layoutResult.value = it
             onTextLayout(it)
-        }
+        },
+        style
     )
 }
 
