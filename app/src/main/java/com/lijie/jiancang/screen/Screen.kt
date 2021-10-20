@@ -1,13 +1,24 @@
 package com.lijie.jiancang.screen
 
+import android.util.Log
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.google.accompanist.insets.LocalWindowInsets
@@ -91,6 +102,53 @@ fun TopAppBar(
         backgroundColor = backgroundColor,
         contentColor = contentColor,
         elevation = elevation,
+    )
+}
+
+@Composable
+fun ClickableText(
+    text: AnnotatedString,
+    modifier: Modifier = Modifier,
+    style: TextStyle = TextStyle.Default,
+    softWrap: Boolean = true,
+    overflow: TextOverflow = TextOverflow.Clip,
+    maxLines: Int = Int.MAX_VALUE,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+    onPress: (Int) -> Unit,
+    onClick: (Int) -> Unit
+) {
+    val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+    val pressIndicator = Modifier.pointerInput(onClick) {
+        awaitPointerEventScope {
+            val event = awaitPointerEvent()
+            event.changes[0].consumeAllChanges()
+            Log.d("ClickableText", "$event")
+        }
+        detectTapGestures(onPress = { pos ->
+            Log.d("ClickableText", "onPress:${layoutResult.value}")
+            layoutResult.value?.let { layoutResult ->
+                val p = layoutResult.getOffsetForPosition(pos)
+                onPress(p)
+            }
+        }) { pos ->
+            Log.d("ClickableText", "onClick:${layoutResult.value}")
+            layoutResult.value?.let { layoutResult ->
+                onClick(layoutResult.getOffsetForPosition(pos))
+            }
+        }
+    }
+
+    BasicText(
+        text = text,
+        modifier = modifier.then(pressIndicator),
+        style = style,
+        softWrap = softWrap,
+        overflow = overflow,
+        maxLines = maxLines,
+        onTextLayout = {
+            layoutResult.value = it
+            onTextLayout(it)
+        }
     )
 }
 

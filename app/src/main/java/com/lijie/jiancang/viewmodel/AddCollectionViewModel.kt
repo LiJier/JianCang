@@ -2,7 +2,6 @@ package com.lijie.jiancang.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.lijie.jiancang.db.AppDatabase
 import com.lijie.jiancang.db.entity.*
 import com.lijie.jiancang.db.entity.Collection
@@ -59,14 +58,21 @@ class AddCollectionViewModel(preview: Boolean = false) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val db = AppDatabase.db
-                val collectionContent = Content(ContentType.Text.type, content.value)
                 val collection = Collection(
                     type = CollectionType.Text.type,
                     original = content.value,
-                    content = Gson().toJson(arrayListOf(collectionContent)),
+                    idea = idea.value,
                     createTime = System.currentTimeMillis()
                 )
                 val id = db.collectionDao().insert(collection)
+                val collectionContent =
+                    Content(
+                        type = ContentType.Text.type,
+                        content = content.value,
+                        collectionId = id,
+                        sort = 0
+                    )
+                db.contentDao().insert(collectionContent)
                 val collectionLabels = labels.value.filter { it.check }
                 val labelQuoteList = collectionLabels.map {
                     LabelQuote(collectionId = id, labelId = it.id, labelName = it.name)

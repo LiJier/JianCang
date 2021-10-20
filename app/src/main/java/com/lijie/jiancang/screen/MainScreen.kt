@@ -1,26 +1,26 @@
 package com.lijie.jiancang.screen
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.accompanist.flowlayout.FlowRow
 import com.lijie.jiancang.R
-import com.lijie.jiancang.db.entity.Collection
-import com.lijie.jiancang.db.entity.Content
+import com.lijie.jiancang.db.entity.CollectionComplete
+import com.lijie.jiancang.ext.annotated
+import com.lijie.jiancang.ext.toTime
+import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.MainViewModel
 
 @Composable
@@ -33,33 +33,71 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
     }) {
         val collections by viewModel.collections.collectAsState()
         if (collections.isNotEmpty()) {
-            LazyColumn {
+            LazyColumn(modifier = Modifier.padding(8.dp)) {
                 items(collections) {
                     CollectionItem(it)
                 }
             }
         }
-        viewModel.queryCollections()
+        LaunchedEffect(key1 = Unit, block = {
+            viewModel.queryCollections()
+        })
     }
 }
 
 @Composable
-fun CollectionItem(collection: Collection) {
+fun CollectionItem(collectionComplete: CollectionComplete) {
+    val theme = LocalViewModel.current.themeFlow.value
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth(),
-            elevation = 2.dp
+            modifier = Modifier.fillMaxWidth(),
+            elevation = 1.dp
         ) {
-            val content: List<Content> =
-                Gson().fromJson(collection.content, object : TypeToken<List<Content>>() {}.type)
             Column(modifier = Modifier.padding(8.dp)) {
-                content.forEach {
-                    Text(text = it.content)
+                val uriHandler = LocalUriHandler.current
+                Text(text = collectionComplete.collection.createTime.toTime(), fontSize = 10.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                var annotatedLinkString by remember {
+                    mutableStateOf(collectionComplete.content.first().content.annotated())
+                }
+                ClickableText(
+                    text = annotatedLinkString,
+                    onPress = {
+                        annotatedLinkString
+                            .getStringAnnotations("URL", it, it)
+                            .firstOrNull()?.let {
+                                annotatedLinkString =
+                                    collectionComplete.content.first().content.annotated(true)
+                            }
+                    },
+                    onClick = {
+                        annotatedLinkString
+                            .getStringAnnotations("URL", it, it)
+                            .firstOrNull()?.let { stringAnnotation ->
+                                annotatedLinkString =
+                                    collectionComplete.content.first().content.annotated(false)
+                                uriHandler.openUri(stringAnnotation.item)
+                            }
+                    })
+                Spacer(modifier = Modifier.height(8.dp))
+                FlowRow(mainAxisSpacing = 2.dp, crossAxisSpacing = 2.dp) {
+                    collectionComplete.labelQuote.forEach {
+                        Text(
+                            text = it.labelName,
+                            fontSize = 10.sp,
+                            color = Color.White,
+                            modifier = Modifier
+                                .background(
+                                    theme.primary,
+                                    shape = Shapes.small
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
                 }
             }
         }

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2cbdbe268ad9e41f6ec19ac9bf6246cf",
+    "identityHash": "504e6a4353759cc36d1142c552fd5ffc",
     "entities": [
       {
         "tableName": "collection",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` INTEGER NOT NULL, `title` TEXT, `original` TEXT NOT NULL, `content` TEXT NOT NULL, `intent` TEXT, `idea` TEXT, `createTime` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` INTEGER NOT NULL, `title` TEXT, `original` TEXT NOT NULL, `intent` TEXT, `idea` TEXT, `has_read` INTEGER NOT NULL, `create_time` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -33,12 +33,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "content",
-            "columnName": "content",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "intent",
             "columnName": "intent",
             "affinity": "TEXT",
@@ -51,8 +45,58 @@
             "notNull": false
           },
           {
+            "fieldPath": "hasRead",
+            "columnName": "has_read",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "createTime",
-            "columnName": "createTime",
+            "columnName": "create_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "content",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `collection_id` INTEGER NOT NULL, `type` TEXT NOT NULL, `content` TEXT NOT NULL, `sort` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collection_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "content",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sort",
+            "columnName": "sort",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -94,7 +138,7 @@
       },
       {
         "tableName": "label_quote",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `collectionId` INTEGER NOT NULL, `labelId` INTEGER NOT NULL, `labelName` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `collection_id` INTEGER NOT NULL, `label_id` INTEGER NOT NULL, `label_name` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -104,19 +148,19 @@
           },
           {
             "fieldPath": "collectionId",
-            "columnName": "collectionId",
+            "columnName": "collection_id",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
             "fieldPath": "labelId",
-            "columnName": "labelId",
+            "columnName": "label_id",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
             "fieldPath": "labelName",
-            "columnName": "labelName",
+            "columnName": "label_name",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -134,7 +178,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2cbdbe268ad9e41f6ec19ac9bf6246cf')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '504e6a4353759cc36d1142c552fd5ffc')"
     ]
   }
 }

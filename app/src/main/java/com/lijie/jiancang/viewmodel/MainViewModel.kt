@@ -2,12 +2,9 @@ package com.lijie.jiancang.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.lijie.jiancang.db.AppDatabase
+import com.lijie.jiancang.db.entity.*
 import com.lijie.jiancang.db.entity.Collection
-import com.lijie.jiancang.db.entity.CollectionType
-import com.lijie.jiancang.db.entity.Content
-import com.lijie.jiancang.db.entity.ContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,17 +14,23 @@ class MainViewModel(preview: Boolean = false) : ViewModel() {
 
     private val _collections = MutableStateFlow(
         if (preview) listOf(
-            Collection(
-                type = CollectionType.Text.type,
-                original = "收藏",
-                content = Gson().toJson(arrayListOf(Content(ContentType.Text.type, "收藏"))),
-                createTime = System.currentTimeMillis()
+            CollectionComplete(
+                Collection(
+                    type = CollectionType.Text.type,
+                    original = "收藏",
+                    createTime = System.currentTimeMillis()
+                ),
+                arrayListOf(Content(type = ContentType.Text.type, content = "https://www.baidu.com https://www.qq.com", sort = 0)),
+                arrayListOf(LabelQuote(labelName = "电影"))
             ),
-            Collection(
-                type = CollectionType.Text.type,
-                original = "预览",
-                content = Gson().toJson(arrayListOf(Content(ContentType.Text.type, "预览"))),
-                createTime = System.currentTimeMillis()
+            CollectionComplete(
+                Collection(
+                    type = CollectionType.Text.type,
+                    original = "预览",
+                    createTime = System.currentTimeMillis()
+                ),
+                arrayListOf(Content(type = ContentType.Text.type, content = "预览", sort = 0)),
+                arrayListOf(LabelQuote(labelName = "歌曲"))
             )
         )
         else listOf()
