@@ -4,13 +4,14 @@ import androidx.room.*
 
 sealed class CollectionType(val type: Int) {
     object Text : CollectionType(0)
+    object Image : CollectionType(1)
 }
 
 @Entity(tableName = "collection")
 data class Collection(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    var type: Int,
+    var type: CollectionType,
     var title: String? = null,
     var original: String,
     var intent: String? = null,
@@ -35,3 +36,34 @@ data class CollectionComplete(
     val labelQuote: List<LabelQuote>
 
 )
+
+class CollectionTypeConverter() {
+
+    @TypeConverter
+    fun toType(type: Int): CollectionType {
+        return when (type) {
+            CollectionType.Text.type -> {
+                CollectionType.Text
+            }
+            CollectionType.Image.type -> {
+                CollectionType.Image
+            }
+            else -> {
+                CollectionType.Text
+            }
+        }
+    }
+
+    @TypeConverter
+    fun toInt(type: CollectionType): Int {
+        return when (type) {
+            CollectionType.Text -> {
+                CollectionType.Text.type
+            }
+            CollectionType.Image -> {
+                CollectionType.Image.type
+            }
+        }
+    }
+
+}

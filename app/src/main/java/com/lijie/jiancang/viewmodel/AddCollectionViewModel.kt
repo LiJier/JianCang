@@ -28,6 +28,7 @@ class AddCollectionViewModel(preview: Boolean = false) : ViewModel() {
     val labels = _labels.asStateFlow()
     val idea = _idea.asStateFlow()
     val save = _save.asStateFlow()
+    var type: CollectionType = CollectionType.Text
 
     fun setContent(content: String) {
         _content.value = content
@@ -59,7 +60,7 @@ class AddCollectionViewModel(preview: Boolean = false) : ViewModel() {
             try {
                 val db = AppDatabase.db
                 val collection = Collection(
-                    type = CollectionType.Text.type,
+                    type = CollectionType.Text,
                     original = content.value,
                     idea = idea.value,
                     createTime = System.currentTimeMillis()
@@ -67,7 +68,7 @@ class AddCollectionViewModel(preview: Boolean = false) : ViewModel() {
                 val id = db.collectionDao().insert(collection)
                 val collectionContent =
                     Content(
-                        type = ContentType.Text.type,
+                        type = ContentType.Text,
                         content = content.value,
                         collectionId = id,
                         sort = 0

@@ -1,8 +1,7 @@
 package com.lijie.jiancang.screen
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -14,16 +13,24 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberImagePainter
+import coil.size.OriginalSize
 import com.google.accompanist.flowlayout.FlowRow
+import com.lijie.jiancang.db.entity.CollectionType
 import com.lijie.jiancang.ext.toast
 import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.AddCollectionViewModel
 
 @Composable
-fun AddCollectionScreen(viewModel: AddCollectionViewModel = viewModel(), content: String = "内容") {
+fun AddCollectionScreen(
+    viewModel: AddCollectionViewModel = viewModel(),
+    content: String = "内容",
+    type: CollectionType = CollectionType.Text
+) {
     Screen(topBar = {
         val onBackPressedDispatcher =
             LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -56,6 +63,7 @@ fun AddCollectionScreen(viewModel: AddCollectionViewModel = viewModel(), content
         )
     }) {
         viewModel.setContent(content)
+        viewModel.type = type
         AddTextCollection(viewModel)
     }
 }
@@ -67,16 +75,35 @@ fun AddTextCollection(viewModel: AddCollectionViewModel) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         var content by remember { mutableStateOf(viewModel.content.value) }
-        OutlinedTextField(
-            value = content,
-            onValueChange = { s ->
-                content = s
-                viewModel.setContent(content)
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
+        val type by remember { mutableStateOf(viewModel.type) }
+        when (type) {
+            CollectionType.Text -> {
+                OutlinedTextField(
+                    value = content,
+                    onValueChange = { s ->
+                        content = s
+                        viewModel.setContent(content)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            CollectionType.Image -> {
+                Image(
+                    painter = rememberImagePainter(
+                        data = content,
+                        builder = {
+                            size(OriginalSize)
+                        },
+                    ),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "标签")
         Spacer(modifier = Modifier.height(8.dp))

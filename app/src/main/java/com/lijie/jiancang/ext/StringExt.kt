@@ -25,7 +25,7 @@ fun String.toast() {
 }
 
 const val URL_TAG = "URL"
-fun String.annotationUrl(checkIndex: Int = 0): AnnotatedString =
+fun String.annotationUrl(checkIndex: Int = -1): AnnotatedString =
     buildAnnotatedString {
         val s = this@annotationUrl
         append(s)

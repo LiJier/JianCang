@@ -24,8 +24,18 @@ android {
             }
         }
     }
-
+    signingConfigs {
+        config {
+            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
+            storePassword 'lj37927'
+            keyAlias 'lj'
+            keyPassword 'lj37927'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.config
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -71,6 +81,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
+    implementation 'com.google.accompanist:accompanist-coil:0.15.0'
     kapt "androidx.room:room-compiler:$room_version"
     implementation 'com.google.code.gson:gson:2.8.8'
     testImplementation 'junit:junit:4.13.2'

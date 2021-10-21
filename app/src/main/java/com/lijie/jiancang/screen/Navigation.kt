@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.lijie.jiancang.db.entity.CollectionType
 import com.lijie.jiancang.viewmodel.LocalViewModel
 
 
@@ -24,8 +25,9 @@ val LocalViewModel = staticCompositionLocalOf {
 fun Navigation(
     localViewModel: LocalViewModel = viewModel(),
     navController: NavHostController = rememberAnimatedNavController(),
-    startDestination: String = Screen.AddCollectionScreen.route,
-    shareContent: String = ""
+    startDestination: String,
+    collectionContent: String = "",
+    collectionType: CollectionType = CollectionType.Text,
 ) {
     CompositionLocalProvider(LocalViewModel provides localViewModel) {
         var arguments = bundleOf()
@@ -43,7 +45,7 @@ fun Navigation(
                 slideOutHorizontally(targetOffsetX = { 1000 })
             }) {
             composable(route = Screen.AddCollectionScreen.route) {
-                AddCollectionScreen(content = shareContent)
+                AddCollectionScreen(content = collectionContent, type = collectionType)
             }
             composable(route = Screen.MainScreen.route) {
                 MainScreen()
