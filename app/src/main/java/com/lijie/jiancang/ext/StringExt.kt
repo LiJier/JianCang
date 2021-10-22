@@ -59,3 +59,21 @@ fun String.annotationUrl(checkIndex: Int = -1): AnnotatedString =
             }
         }
     }
+
+fun String.findUrl(): String? {
+    val urlList = arrayListOf<String>()
+    var endIndex = 0
+    while (endIndex < length) {
+        val startIndex = indexOf("http", endIndex)
+        if (startIndex < 0) {
+            endIndex = length
+        } else {
+            endIndex = indexOf(" ", startIndex, true)
+            if (endIndex < 0) {
+                endIndex = length
+            }
+            urlList.add(substring(startIndex, endIndex))
+        }
+    }
+    return urlList.lastOrNull()
+}

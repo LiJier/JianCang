@@ -9,6 +9,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.annotation.ExperimentalCoilApi
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -20,6 +21,7 @@ val LocalViewModel = staticCompositionLocalOf {
     LocalViewModel()
 }
 
+@ExperimentalCoilApi
 @ExperimentalAnimationApi
 @Composable
 fun Navigation(

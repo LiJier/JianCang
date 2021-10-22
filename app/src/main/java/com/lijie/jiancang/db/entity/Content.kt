@@ -15,7 +15,7 @@ data class Content(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     @ColumnInfo(name = "collection_id")
-    val collectionId: Long = 0,
+    var collectionId: Long = 0,
     var type: ContentType,
     var content: String,
     var sort: Int

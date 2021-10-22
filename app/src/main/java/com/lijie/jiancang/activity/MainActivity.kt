@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.core.view.WindowCompat
 import com.lijie.jiancang.db.entity.CollectionType
+import com.lijie.jiancang.ext.findUrl
 import com.lijie.jiancang.screen.Navigation
 import com.lijie.jiancang.screen.Screen
 
@@ -19,15 +20,18 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val (content, type) = when (intent.action) {
             Intent.ACTION_PROCESS_TEXT -> {
+                val s = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString()
+                val url = s.findUrl()
                 Pair(
-                    intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString(),
-                    CollectionType.Text
+                    url ?: s, if (url == null) CollectionType.Text else CollectionType.URL
                 )
             }
             Intent.ACTION_SEND -> {
                 when (intent.type) {
                     "text/plain" -> {
-                        Pair(intent.getStringExtra(Intent.EXTRA_TEXT) ?: "", CollectionType.Text)
+                        val s = intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+                        val url = s.findUrl()
+                        Pair(url ?: s, if (url == null) CollectionType.Text else CollectionType.URL)
                     }
                     "image/*" -> {
                         Pair(

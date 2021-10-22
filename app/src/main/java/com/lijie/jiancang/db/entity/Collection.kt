@@ -5,6 +5,7 @@ import androidx.room.*
 sealed class CollectionType(val type: Int) {
     object Text : CollectionType(0)
     object Image : CollectionType(1)
+    object URL : CollectionType(2)
 }
 
 @Entity(tableName = "collection")
@@ -48,6 +49,9 @@ class CollectionTypeConverter() {
             CollectionType.Image.type -> {
                 CollectionType.Image
             }
+            CollectionType.URL.type -> {
+                CollectionType.URL
+            }
             else -> {
                 CollectionType.Text
             }
@@ -62,6 +66,9 @@ class CollectionTypeConverter() {
             }
             CollectionType.Image -> {
                 CollectionType.Image.type
+            }
+            CollectionType.URL -> {
+                CollectionType.URL.type
             }
         }
     }
