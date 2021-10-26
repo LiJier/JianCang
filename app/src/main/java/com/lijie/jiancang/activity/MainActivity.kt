@@ -6,12 +6,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.view.WindowCompat
+import coil.annotation.ExperimentalCoilApi
 import com.lijie.jiancang.db.entity.CollectionType
 import com.lijie.jiancang.ext.findUrl
 import com.lijie.jiancang.screen.Navigation
 import com.lijie.jiancang.screen.Screen
 
+@ExperimentalUnitApi
+@ExperimentalCoilApi
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
 

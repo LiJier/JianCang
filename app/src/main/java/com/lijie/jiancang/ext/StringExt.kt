@@ -68,7 +68,15 @@ fun String.findUrl(): String? {
         if (startIndex < 0) {
             endIndex = length
         } else {
-            endIndex = indexOf(" ", startIndex, true)
+            fun getEndIndex(string: String): Int {
+                var i = indexOf(string, startIndex, true)
+                if (i < 0) {
+                    i = length
+                }
+                return i
+            }
+            endIndex =
+                kotlin.math.min(getEndIndex(" "), getEndIndex(" "))
             if (endIndex < 0) {
                 endIndex = length
             }

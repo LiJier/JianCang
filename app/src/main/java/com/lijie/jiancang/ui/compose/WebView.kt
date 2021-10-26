@@ -1,6 +1,7 @@
 package com.lijie.jiancang.ui.compose
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -10,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.viewinterop.AndroidView
+import com.kohlschutter.boilerpipe.extractors.KeepEverythingWithMinKWordsExtractor
 
 @ExperimentalUnitApi
 @SuppressLint("SetJavaScriptEnabled")
@@ -43,7 +45,8 @@ class InJavaScriptLocalObj {
 
     @JavascriptInterface
     fun showSource(html: String) {
-
+        val text = KeepEverythingWithMinKWordsExtractor(2).getText("<html>${html}</html>")
+        Log.d("WebView", text)
     }
 
 }

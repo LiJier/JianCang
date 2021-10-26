@@ -6,6 +6,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -21,6 +22,7 @@ val LocalViewModel = staticCompositionLocalOf {
     LocalViewModel()
 }
 
+@ExperimentalUnitApi
 @ExperimentalCoilApi
 @ExperimentalAnimationApi
 @Composable

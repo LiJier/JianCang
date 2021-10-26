@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.annotation.ExperimentalCoilApi
@@ -30,6 +31,7 @@ import com.lijie.jiancang.ui.compose.WebView
 import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.AddCollectionViewModel
 
+@ExperimentalUnitApi
 @SuppressLint("SetJavaScriptEnabled")
 @ExperimentalCoilApi
 @Composable
@@ -149,6 +151,7 @@ fun AddCollectionScreen(
     }
 }
 
+@ExperimentalUnitApi
 @ExperimentalCoilApi
 @Preview
 @Composable
