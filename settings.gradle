@@ -6,4 +6,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "JianCang"
-include ':app',':boilerpipe'
+include ':app'

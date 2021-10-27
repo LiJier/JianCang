@@ -9,6 +9,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.util.rangeTo
 import com.lijie.jiancang.App
+import java.util.regex.Pattern
 
 var toast: Toast? = null
 
@@ -84,4 +85,16 @@ fun String.findUrl(): String? {
         }
     }
     return urlList.lastOrNull()
+}
+
+fun String.filterHtml(): String {
+    var str = this
+    val regEx = "(?!<(img |a ).*?>)<.*?>"
+    val pHtml = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE)
+    val mHtml = pHtml.matcher(str)
+    str = mHtml.replaceAll("")
+    val pN = Pattern.compile("(\r?\n(\\s*\r?\n)+)")
+    val pM = pN.matcher(str)
+    str = pM.replaceAll("\r\n")
+    return str.trim()
 }

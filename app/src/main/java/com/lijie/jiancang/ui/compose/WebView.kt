@@ -11,7 +11,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.viewinterop.AndroidView
-import com.kohlschutter.boilerpipe.extractors.KeepEverythingWithMinKWordsExtractor
+import com.lijie.jiancang.ext.filterHtml
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 
 @ExperimentalUnitApi
 @SuppressLint("SetJavaScriptEnabled")
@@ -45,8 +47,37 @@ class InJavaScriptLocalObj {
 
     @JavascriptInterface
     fun showSource(html: String) {
-        val text = KeepEverythingWithMinKWordsExtractor(2).getText("<html>${html}</html>")
-        Log.d("WebView", text)
+        val jsoup = Jsoup.parse(html)
+        jsoup.getElementsByTag("script").remove()
+        jsoup.getElementsByTag("style").remove()
+        val sb = StringBuilder()
+        var lastElement = Element("a")
+        jsoup.body().allElements.forEach { element ->
+            val elms = element.getElementsByTag("div")
+            if (elms.size <= 1) {
+                val textNodes = elms.textNodes()
+                if (textNodes.size > 0) {
+                    if (lastElement.allElements.contains(element).not()) {
+                        val s = element.toString().trim().filterHtml()
+                        if (s.isNotEmpty()) {
+                            sb.append(s).append("\n")
+                        }
+                        lastElement = element
+                    }
+                } else {
+                    if (elms.isEmpty()) {
+                        if (lastElement.allElements.contains(element).not()) {
+                            val s = element.toString().trim().filterHtml()
+                            if (s.isNotEmpty()) {
+                                sb.append(s).append("\n")
+                            }
+                            lastElement = element
+                        }
+                    }
+                }
+            }
+        }
+        Log.d("WebView", sb.toString())
     }
 
 }
