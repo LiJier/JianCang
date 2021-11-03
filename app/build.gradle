@@ -26,8 +26,8 @@ android {
     }
     signingConfigs {
         config {
-            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
-//            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
+//            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
+            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
             storePassword 'lj37927'
             keyAlias 'lj'
             keyPassword 'lj37927'
