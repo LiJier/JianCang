@@ -24,8 +24,8 @@ import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.flowlayout.FlowRow
 import com.lijie.jiancang.R
-import com.lijie.jiancang.db.entity.CollectionComplete
-import com.lijie.jiancang.db.entity.ContentType
+import com.lijie.jiancang.db.entity.*
+import com.lijie.jiancang.db.entity.Collection
 import com.lijie.jiancang.ext.toTime
 import com.lijie.jiancang.ui.compose.AutoLinkText
 import com.lijie.jiancang.ui.compose.TopAppBar
@@ -34,7 +34,9 @@ import com.lijie.jiancang.viewmodel.MainViewModel
 
 @ExperimentalCoilApi
 @Composable
-fun MainScreen(viewModel: MainViewModel = viewModel()) {
+fun MainScreen(
+    viewModel: MainViewModel = viewModel()
+) {
     val context = LocalContext.current
     Screen(topBar = {
         TopAppBar(
@@ -58,7 +60,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
 @ExperimentalCoilApi
 @Composable
 fun CollectionItem(collectionComplete: CollectionComplete) {
-    val theme = LocalViewModel.current.themeFlow.value
+    val theme by LocalViewModel.current.themeFlow.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,6 +119,41 @@ fun CollectionItem(collectionComplete: CollectionComplete) {
 @ExperimentalCoilApi
 @Preview
 @Composable
-private fun Preview() {
-    MainScreen(MainViewModel(true))
+private fun PreviewURLItem() {
+    CollectionItem(
+        CollectionComplete(
+            Collection(
+                type = CollectionType.Text,
+                original = "收藏",
+                createTime = System.currentTimeMillis()
+            ),
+            arrayListOf(
+                Content(
+                    type = ContentType.Text,
+                    content = "https://www.baidu.com https://www.qq.com",
+                    sort = 0
+                )
+            ),
+            arrayListOf(LabelQuote(labelName = "电影"))
+        )
+    )
 }
+
+@ExperimentalCoilApi
+@Preview
+@Composable
+private fun PreviewText() {
+    CollectionItem(
+        CollectionComplete(
+            Collection(
+                type = CollectionType.Text,
+                original = "预览",
+                createTime = System.currentTimeMillis()
+            ),
+            arrayListOf(Content(type = ContentType.Text, content = "预览", sort = 0)),
+            arrayListOf(LabelQuote(labelName = "歌曲"))
+        )
+    )
+}
+
+

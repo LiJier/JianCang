@@ -6,6 +6,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -40,12 +41,12 @@ fun JianCangTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composab
         } else {
             LocalViewModel.current.setTheme(LightColorPalette)
         }
-        val theme = LocalViewModel.current.themeFlow.collectAsState()
+        val theme by LocalViewModel.current.themeFlow.collectAsState()
         rememberSystemUiController().setStatusBarColor(
             Color.Transparent
         )
         MaterialTheme(
-            colors = theme.value,
+            colors = theme,
             typography = Typography,
             shapes = Shapes,
             content = content

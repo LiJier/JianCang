@@ -40,7 +40,7 @@ fun AddCollectionScreen(
     content: String = "内容",
     type: CollectionType = CollectionType.Text
 ) {
-    val theme = LocalViewModel.current.themeFlow.value
+    val theme by LocalViewModel.current.themeFlow.collectAsState()
     viewModel.original = content
     var editContent by remember { mutableStateOf(content) }
     var contentType: ContentType = ContentType.Text
