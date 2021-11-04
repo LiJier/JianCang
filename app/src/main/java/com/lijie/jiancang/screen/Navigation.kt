@@ -36,16 +36,16 @@ fun Navigation(
     CompositionLocalProvider(LocalViewModel provides localViewModel) {
         var arguments = bundleOf()
         AnimatedNavHost(navController = navController, startDestination = startDestination,
-            enterTransition = { _, _ ->
+            enterTransition = {
                 slideInHorizontally(initialOffsetX = { 1000 })
             },
-            exitTransition = { _, _ ->
+            exitTransition = {
                 slideOutHorizontally(targetOffsetX = { -1000 })
             },
-            popEnterTransition = { _, _ ->
+            popEnterTransition = {
                 slideInHorizontally(initialOffsetX = { -1000 })
             },
-            popExitTransition = { _, _ ->
+            popExitTransition = {
                 slideOutHorizontally(targetOffsetX = { 1000 })
             }) {
             composable(route = Screen.AddCollectionScreen.route) {

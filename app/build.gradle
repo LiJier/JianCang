@@ -26,8 +26,8 @@ android {
     }
     signingConfigs {
         config {
-//            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
-            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
+            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
+//            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
             storePassword 'lj37927'
             keyAlias 'lj'
             keyPassword 'lj37927'
@@ -84,7 +84,8 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     implementation 'io.coil-kt:coil-compose:1.4.0'
     implementation 'com.google.code.gson:gson:2.8.8'
-    implementation 'org.jsoup:jsoup:1.14.3'
+    implementation project(path: ':remark')
+    implementation 'com.github.jeziellago:compose-markdown:0.2.6'
     kapt "androidx.room:room-compiler:$room_version"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
