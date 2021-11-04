@@ -24,10 +24,9 @@ import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.flowlayout.FlowRow
 import com.lijie.jiancang.db.entity.CollectionType
-import com.lijie.jiancang.db.entity.ContentType
+import com.lijie.jiancang.db.entity.Label
 import com.lijie.jiancang.ext.toast
 import com.lijie.jiancang.ui.compose.TopAppBar
-import com.lijie.jiancang.ui.compose.WebView
 import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.AddCollectionViewModel
 
@@ -40,10 +39,10 @@ fun AddCollectionScreen(
     content: String = "内容",
     type: CollectionType = CollectionType.Text
 ) {
-    val theme by LocalViewModel.current.themeFlow.collectAsState()
-    viewModel.original = content
+    viewModel.setType(type)
+    viewModel.setTitle(content)
+    viewModel.setContent(content)
     var editContent by remember { mutableStateOf(content) }
-    var contentType: ContentType = ContentType.Text
     Screen(topBar = {
         val onBackPressedDispatcher =
             LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -58,14 +57,11 @@ fun AddCollectionScreen(
             },
             actions = {
                 IconButton(onClick = {
-                    if (type != CollectionType.URL) {
-                        viewModel.addContent(contentType, editContent)
-                    }
                     viewModel.saveCollection()
                 }) {
                     Icon(Icons.Default.Done, contentDescription = "保存")
                 }
-                val save by viewModel.save.collectAsState()
+                val save by viewModel.saved.collectAsState()
                 when (save) {
                     true -> {
                         "保存成功".toast()
@@ -86,15 +82,27 @@ fun AddCollectionScreen(
         ) {
             when (type) {
                 CollectionType.Text -> {
-                    contentType = ContentType.Text
                     OutlinedTextField(
                         value = editContent,
-                        onValueChange = { editContent = it },
+                        onValueChange = {
+                            viewModel.setContent(editContent)
+                            editContent = it
+                        },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
+                CollectionType.URL -> {
+                    OutlinedTextField(
+                        value = editContent,
+                        onValueChange = {
+                            viewModel.setContent(editContent)
+                            editContent = it
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = false
+                    )
+                }
                 CollectionType.Image -> {
-                    contentType = ContentType.Image
                     Image(
                         painter = rememberImagePainter(
                             data = content,
@@ -107,38 +115,17 @@ fun AddCollectionScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-                CollectionType.URL -> {
-                    WebView(url = content)
-                }
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "标签")
             Spacer(modifier = Modifier.height(8.dp))
-            val labelState by viewModel.labels.collectAsState()
-            FlowRow(mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
-                labelState.forEach { label ->
-                    var check by remember { mutableStateOf(label.check) }
-                    Text(
-                        text = label.name,
-                        color = Color.White,
-                        modifier = Modifier
-                            .background(
-                                if (check) theme.primaryVariant else theme.primary,
-                                shape = Shapes.small
-                            )
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                            .clickable {
-                                check = check.not()
-                                label.check = check
-                            }
-                    )
-                }
-            }
+            val labels by viewModel.labels.collectAsState()
+            LabelsFlow(labels)
             LaunchedEffect(Unit) { viewModel.queryLabel() }
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "想法")
             Spacer(modifier = Modifier.height(8.dp))
-            var idea by remember { mutableStateOf(viewModel.idea.value) }
+            var idea by remember { mutableStateOf("") }
             OutlinedTextField(
                 value = idea,
                 onValueChange = { s ->
@@ -151,10 +138,43 @@ fun AddCollectionScreen(
     }
 }
 
+@Composable
+fun LabelsFlow(labels: List<Label>) {
+    val theme by LocalViewModel.current.themeFlow.collectAsState()
+    FlowRow(mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
+        labels.forEach { label ->
+            var check by remember { mutableStateOf(label.check) }
+            Text(
+                text = label.name,
+                color = Color.White,
+                modifier = Modifier
+                    .background(
+                        if (check) theme.primaryVariant else theme.primary,
+                        shape = Shapes.small
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .clickable {
+                        check = check.not()
+                        label.check = check
+                    }
+            )
+        }
+    }
+}
+
 @ExperimentalUnitApi
 @ExperimentalCoilApi
 @Preview
 @Composable
 private fun Preview() {
-    AddCollectionScreen(AddCollectionViewModel(true))
+    AddCollectionScreen(AddCollectionViewModel().apply {
+        setLabels(
+            arrayListOf(
+                Label(name = "电影"),
+                Label(name = "图书"),
+                Label(name = "歌曲")
+            )
+        )
+    })
 }
+

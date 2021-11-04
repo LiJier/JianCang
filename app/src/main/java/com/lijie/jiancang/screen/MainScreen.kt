@@ -24,8 +24,10 @@ import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.flowlayout.FlowRow
 import com.lijie.jiancang.R
-import com.lijie.jiancang.db.entity.*
 import com.lijie.jiancang.db.entity.Collection
+import com.lijie.jiancang.db.entity.CollectionComplete
+import com.lijie.jiancang.db.entity.CollectionType
+import com.lijie.jiancang.db.entity.LabelQuote
 import com.lijie.jiancang.ext.toTime
 import com.lijie.jiancang.ui.compose.AutoLinkText
 import com.lijie.jiancang.ui.compose.TopAppBar
@@ -73,26 +75,30 @@ fun CollectionItem(collectionComplete: CollectionComplete) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(text = collectionComplete.collection.createTime.toTime(), fontSize = 10.sp)
                 Spacer(modifier = Modifier.height(8.dp))
-                collectionComplete.content.forEach {
-                    when (it.type) {
-                        ContentType.Text -> {
-                            AutoLinkText(
-                                text = it.content
-                            )
-                        }
-                        ContentType.Image -> {
-                            Image(
-                                painter = rememberImagePainter(
-                                    data = it.content,
-                                    builder = {
-                                        size(OriginalSize)
-                                    },
-                                ),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.size(80.dp, 80.dp)
-                            )
-                        }
+                val collection = collectionComplete.collection
+                when (collection.type) {
+                    CollectionType.Text -> {
+                        Text(
+                            text = collection.content
+                        )
+                    }
+                    CollectionType.URL -> {
+                        AutoLinkText(
+                            text = collection.content
+                        )
+                    }
+                    CollectionType.Image -> {
+                        Image(
+                            painter = rememberImagePainter(
+                                data = collection.content,
+                                builder = {
+                                    size(OriginalSize)
+                                },
+                            ),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(80.dp, 80.dp)
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -124,15 +130,8 @@ private fun PreviewURLItem() {
         CollectionComplete(
             Collection(
                 type = CollectionType.Text,
-                original = "收藏",
+                content = "收藏",
                 createTime = System.currentTimeMillis()
-            ),
-            arrayListOf(
-                Content(
-                    type = ContentType.Text,
-                    content = "https://www.baidu.com https://www.qq.com",
-                    sort = 0
-                )
             ),
             arrayListOf(LabelQuote(labelName = "电影"))
         )
@@ -147,10 +146,9 @@ private fun PreviewText() {
         CollectionComplete(
             Collection(
                 type = CollectionType.Text,
-                original = "预览",
+                content = "预览",
                 createTime = System.currentTimeMillis()
             ),
-            arrayListOf(Content(type = ContentType.Text, content = "预览", sort = 0)),
             arrayListOf(LabelQuote(labelName = "歌曲"))
         )
     )

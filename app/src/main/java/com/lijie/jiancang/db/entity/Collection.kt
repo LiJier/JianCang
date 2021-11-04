@@ -14,31 +14,24 @@ data class Collection(
     val id: Long = 0,
     var type: CollectionType,
     var title: String? = null,
-    var original: String,
-    var intent: String? = null,
+    var content: String,
     var idea: String? = null,
     @ColumnInfo(name = "has_read")
     var hasRead: Boolean = false,
     @ColumnInfo(name = "create_time")
-    var createTime: Long,
+    var createTime: Long = System.currentTimeMillis(),
 )
 
 data class CollectionComplete(
-    @Embedded val collection: Collection,
+    @Embedded var collection: Collection,
     @Relation(
         parentColumn = "id",
         entityColumn = "collection_id"
     )
-    val content: List<Content>,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "collection_id"
-    )
-    val labelQuote: List<LabelQuote>
-
+    var labelQuote: List<LabelQuote>
 )
 
-class CollectionTypeConverter() {
+class CollectionTypeConverter {
 
     @TypeConverter
     fun toType(type: Int): CollectionType {

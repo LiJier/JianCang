@@ -10,31 +10,40 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AddCollectionViewModel(preview: Boolean = false) : ViewModel() {
+class AddCollectionViewModel : ViewModel() {
 
-    private val _contents = MutableStateFlow(arrayListOf<Content>())
-    private val _labels = MutableStateFlow(
-        if (preview)
-            listOf(
-                Label(name = "预览"),
-                Label(name = "预览"),
-                Label(name = "预览")
-            )
-        else listOf()
+    private val collectionComplete = CollectionComplete(
+        Collection(
+            type = CollectionType.Text,
+            title = "",
+            content = "",
+            idea = "",
+        ),
+        arrayListOf()
     )
-    private val _idea = MutableStateFlow("")
-    private val _save = MutableStateFlow<Boolean?>(null)
-    val contents = _contents.asStateFlow()
+    private val _labels = MutableStateFlow(listOf<Label>())
+    private val _saved = MutableStateFlow<Boolean?>(null)
     val labels = _labels.asStateFlow()
-    val idea = _idea.asStateFlow()
-    val save = _save.asStateFlow()
-    var original: String = ""
-    var type: CollectionType = CollectionType.Text
+    val saved = _saved.asStateFlow()
 
-    fun addContent(type: ContentType, content: String) {
-        val contents = _contents.value
-        contents.add(Content(type = type, content = content, sort = contents.size))
-        _contents.value = contents
+    fun setType(type: CollectionType) {
+        collectionComplete.collection.type = type
+    }
+
+    fun setTitle(title: String) {
+        collectionComplete.collection.title = title
+    }
+
+    fun setContent(content: String) {
+        collectionComplete.collection.content = content
+    }
+
+    fun setIdea(idea: String) {
+        collectionComplete.collection.idea = idea
+    }
+
+    fun setLabels(labels: List<Label>) {
+        _labels.value = labels
     }
 
     fun queryLabel() {
@@ -50,39 +59,24 @@ class AddCollectionViewModel(preview: Boolean = false) : ViewModel() {
                     )
                 )
             }
-            _labels.value = labelDao.queryLabels().orEmpty()
+            setLabels(labelDao.queryLabels().orEmpty())
         }
-    }
-
-    fun setIdea(idea: String) {
-        _idea.value = idea
     }
 
     fun saveCollection() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val db = AppDatabase.db
-                val collection = Collection(
-                    type = CollectionType.Text,
-                    original = original,
-                    idea = idea.value,
-                    createTime = System.currentTimeMillis()
-                )
-                val id = db.collectionDao().insert(collection)
-                val contents = _contents.value.map {
-                    it.collectionId = id
-                    it
-                }
-                db.contentDao().insert(contents)
+                val id = db.collectionDao().insert(collectionComplete.collection)
                 val collectionLabels = labels.value.filter { it.check }
                 val labelQuoteList = collectionLabels.map {
                     LabelQuote(collectionId = id, labelId = it.id, labelName = it.name)
                 }
                 db.labelQuoteDao().insert(labelQuoteList)
-                _save.value = true
+                _saved.value = true
             } catch (e: Exception) {
                 e.printStackTrace()
-                _save.value = false
+                _saved.value = false
             }
         }
     }
