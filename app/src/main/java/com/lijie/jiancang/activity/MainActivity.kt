@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.view.WindowCompat
 import coil.annotation.ExperimentalCoilApi
 import com.lijie.jiancang.db.entity.CollectionType
-import com.lijie.jiancang.ext.findUrl
 import com.lijie.jiancang.screen.Navigation
 import com.lijie.jiancang.screen.Screen
 
@@ -25,17 +24,13 @@ class MainActivity : ComponentActivity() {
         val (content, type) = when (intent.action) {
             Intent.ACTION_PROCESS_TEXT -> {
                 val s = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString()
-                val url = s.findUrl()
-                Pair(
-                    url ?: s, if (url == null) CollectionType.Text else CollectionType.URL
-                )
+                Pair(s, CollectionType.Text)
             }
             Intent.ACTION_SEND -> {
                 when (intent.type) {
                     "text/plain" -> {
                         val s = intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
-                        val url = s.findUrl()
-                        Pair(url ?: s, if (url == null) CollectionType.Text else CollectionType.URL)
+                        Pair(s, CollectionType.Text)
                     }
                     "image/*" -> {
                         Pair(

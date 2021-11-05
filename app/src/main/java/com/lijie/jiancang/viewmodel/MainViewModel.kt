@@ -21,7 +21,15 @@ class MainViewModel : ViewModel() {
     fun queryCollections() {
         viewModelScope.launch(Dispatchers.IO) {
             val collectionDao = AppDatabase.db.collectionDao()
-            _collections.value = collectionDao.queryCollections()
+            setCollections(collectionDao.queryCollections())
+        }
+    }
+
+    fun deleteCollection(collectionComplete: CollectionComplete) {
+        viewModelScope.launch(Dispatchers.IO) {
+            AppDatabase.db.collectionDao().delete(collectionComplete.collection)
+            AppDatabase.db.labelQuoteDao().delete(collectionComplete.labelQuote)
+            queryCollections()
         }
     }
 

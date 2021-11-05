@@ -2,17 +2,16 @@ package com.lijie.jiancang.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,28 +33,34 @@ import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.MainViewModel
 
+val LocalMainViewModel = staticCompositionLocalOf {
+    MainViewModel()
+}
+
 @ExperimentalCoilApi
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = viewModel()
 ) {
-    val context = LocalContext.current
-    Screen(topBar = {
-        TopAppBar(
-            title = { Text(text = context.getString(R.string.app_name)) }
-        )
-    }) {
-        val collections by viewModel.collections.collectAsState()
-        if (collections.isNotEmpty()) {
-            LazyColumn(modifier = Modifier.padding(8.dp)) {
-                items(collections) {
-                    CollectionItem(it)
+    CompositionLocalProvider(LocalMainViewModel provides viewModel) {
+        val context = LocalContext.current
+        Screen(topBar = {
+            TopAppBar(
+                title = { Text(text = context.getString(R.string.app_name)) }
+            )
+        }) {
+            val collections by viewModel.collections.collectAsState()
+            if (collections.isNotEmpty()) {
+                LazyColumn(modifier = Modifier.padding(8.dp)) {
+                    items(collections) {
+                        CollectionItem(it)
+                    }
                 }
             }
+            LaunchedEffect(key1 = Unit, block = {
+                viewModel.queryCollections()
+            })
         }
-        LaunchedEffect(key1 = Unit, block = {
-            viewModel.queryCollections()
-        })
     }
 }
 
@@ -63,22 +68,36 @@ fun MainScreen(
 @Composable
 fun CollectionItem(collectionComplete: CollectionComplete) {
     val theme by LocalViewModel.current.themeFlow.collectAsState()
+    val viewModel = LocalMainViewModel.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            viewModel.deleteCollection(collectionComplete)
+                        }
+                    )
+                },
             elevation = 1.dp
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(text = collectionComplete.collection.createTime.toTime(), fontSize = 10.sp)
                 Spacer(modifier = Modifier.height(8.dp))
+                val title = collectionComplete.collection.title ?: ""
+                if (title.isNotEmpty()) {
+                    Text(text = title, fontSize = 18.sp)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 val collection = collectionComplete.collection
                 when (collection.type) {
                     CollectionType.Text -> {
-                        Text(
+                        AutoLinkText(
                             text = collection.content
                         )
                     }
@@ -125,33 +144,31 @@ fun CollectionItem(collectionComplete: CollectionComplete) {
 @ExperimentalCoilApi
 @Preview
 @Composable
-private fun PreviewURLItem() {
-    CollectionItem(
-        CollectionComplete(
-            Collection(
-                type = CollectionType.Text,
-                content = "收藏",
-                createTime = System.currentTimeMillis()
-            ),
-            arrayListOf(LabelQuote(labelName = "电影"))
+private fun Preview() {
+    MainScreen(MainViewModel().apply {
+        setCollections(
+            listOf(
+                CollectionComplete(
+                    Collection(
+                        type = CollectionType.URL,
+                        title = "百度",
+                        content = "https://www.baidu.com/",
+                        createTime = System.currentTimeMillis()
+                    ),
+                    arrayListOf(LabelQuote(labelName = "电影"))
+                ),
+                CollectionComplete(
+                    Collection(
+                        type = CollectionType.Text,
+                        title = "标题",
+                        content = "预览",
+                        createTime = System.currentTimeMillis()
+                    ),
+                    arrayListOf(LabelQuote(labelName = "歌曲"))
+                )
+            )
         )
-    )
-}
-
-@ExperimentalCoilApi
-@Preview
-@Composable
-private fun PreviewText() {
-    CollectionItem(
-        CollectionComplete(
-            Collection(
-                type = CollectionType.Text,
-                content = "预览",
-                createTime = System.currentTimeMillis()
-            ),
-            arrayListOf(LabelQuote(labelName = "歌曲"))
-        )
-    )
+    })
 }
 
 
