@@ -27,10 +27,12 @@ import com.lijie.jiancang.db.entity.CollectionType
 import com.lijie.jiancang.db.entity.Label
 import com.lijie.jiancang.ext.findUrl
 import com.lijie.jiancang.ext.toast
+import com.lijie.jiancang.ui.compose.ProgressDialog
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.compose.WebView
 import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.AddCollectionViewModel
+import com.overzealous.remark.Remark
 
 val LocalAddCollectionViewModel = staticCompositionLocalOf {
     AddCollectionViewModel()
@@ -46,6 +48,7 @@ fun AddCollectionScreen(
     type: CollectionType = CollectionType.Text
 ) {
     CompositionLocalProvider(LocalAddCollectionViewModel provides viewModel) {
+        viewModel.setOriginal(content)
         Screen(topBar = {
             val onBackPressedDispatcher =
                 LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -83,7 +86,11 @@ fun AddCollectionScreen(
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                var editTitle by remember { mutableStateOf("标题") }
+                var editTitle by remember {
+                    mutableStateOf(
+                        content.substring(0, if (content.length > 6) 6 else content.length)
+                    )
+                }
                 viewModel.setTitle(editTitle)
                 Text(text = "标题", modifier = Modifier.padding(vertical = 8.dp))
                 OutlinedTextField(
@@ -101,6 +108,7 @@ fun AddCollectionScreen(
                         viewModel.setTitle(editTitle)
                     }
                 } else if (type == CollectionType.Image) {
+                    viewModel.setType(type)
                     ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
                         Image(
                             painter = rememberImagePainter(data = content) {
@@ -140,7 +148,7 @@ fun AddCollectionScreen(
 @Composable
 fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
     val viewModel = LocalAddCollectionViewModel.current
-    val url = content.findUrl().orEmpty()
+    val url by remember { mutableStateOf(content.findUrl().orEmpty()) }
     var type by remember {
         mutableStateOf(
             if (url.isEmpty()) {
@@ -151,12 +159,25 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
         )
     }
     var editContent by remember { mutableStateOf(if (type == CollectionType.Text) content else url) }
+    var markDownContent by remember { mutableStateOf("") }
     viewModel.setType(type)
     viewModel.setContent(editContent)
     Column(modifier = Modifier.fillMaxWidth()) {
         Box {
-            if (type == CollectionType.URL) {
-                WebView(url = url, onLoadComplete = onLoadComplete, modifier = Modifier.size(1.dp))
+            if (type != CollectionType.Text) {
+                var showProgress by remember { mutableStateOf(false) }
+                if (showProgress) {
+                    ProgressDialog(onDismissRequest = { showProgress = false })
+                }
+                WebView(url = url, onLoadComplete = { title, html ->
+                    onLoadComplete(title, html)
+                    markDownContent = Remark().convert(html)
+                    if (type == CollectionType.MD) {
+                        editContent = markDownContent
+                        viewModel.setContent(markDownContent)
+                    }
+                    showProgress = false
+                }, modifier = Modifier.size(1.dp))
             }
             OutlinedTextField(
                 value = editContent,
@@ -188,6 +209,16 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
                 }
             })
             Text(text = "链接")
+            Spacer(modifier = Modifier.width(16.dp))
+            Checkbox(checked = type == CollectionType.MD, onCheckedChange = {
+                if (it) {
+                    type = CollectionType.MD
+                    editContent = markDownContent
+                    viewModel.setType(type)
+                    viewModel.setContent(editContent)
+                }
+            })
+            Text(text = "离线MD")
         }
     }
 }

@@ -5,9 +5,6 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.viewinterop.AndroidView
@@ -16,9 +13,11 @@ import org.jsoup.Jsoup
 @ExperimentalUnitApi
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebView(url: String, modifier: Modifier = Modifier, onLoadComplete: (String, String) -> Unit) {
-
-    val loadUrl by remember { mutableStateOf(url) }
+fun WebView(
+    url: String,
+    modifier: Modifier = Modifier,
+    onLoadComplete: (String, String) -> Unit
+) {
 
     class InJavaScriptLocalObj {
 
@@ -56,7 +55,7 @@ fun WebView(url: String, modifier: Modifier = Modifier, onLoadComplete: (String,
             }
 
         }
-        webView.loadUrl(loadUrl)
+        webView.loadUrl(url)
         webView
     }, modifier)
 

@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "com.lijie.jiancang"
         minSdk 23
-        targetSdk 31
+        targetSdk 30
         versionCode 1
         versionName "1.0"
 
@@ -26,8 +26,8 @@ android {
     }
     signingConfigs {
         config {
-            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
-//            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
+//            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
+            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
             storePassword 'lj37927'
             keyAlias 'lj'
             keyPassword 'lj37927'
@@ -86,6 +86,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation project(path: ':remark')
     implementation 'com.github.jeziellago:compose-markdown:0.2.6'
+    implementation 'com.github.javakam:file.core:2.3.0@aar'
+    implementation 'com.guolindev.permissionx:permissionx:1.6.1'
     kapt "androidx.room:room-compiler:$room_version"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

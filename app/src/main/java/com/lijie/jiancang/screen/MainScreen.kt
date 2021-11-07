@@ -32,6 +32,7 @@ import com.lijie.jiancang.ui.compose.AutoLinkText
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.MainViewModel
+import java.io.File
 
 val LocalMainViewModel = staticCompositionLocalOf {
     MainViewModel()
@@ -109,7 +110,7 @@ fun CollectionItem(collectionComplete: CollectionComplete) {
                     CollectionType.Image -> {
                         Image(
                             painter = rememberImagePainter(
-                                data = collection.content,
+                                data = File(collection.content),
                                 builder = {
                                     size(OriginalSize)
                                 },
@@ -151,6 +152,7 @@ private fun Preview() {
                 CollectionComplete(
                     Collection(
                         type = CollectionType.URL,
+                        original = "",
                         title = "百度",
                         content = "https://www.baidu.com/",
                         createTime = System.currentTimeMillis()
@@ -160,6 +162,7 @@ private fun Preview() {
                 CollectionComplete(
                     Collection(
                         type = CollectionType.Text,
+                        original = "",
                         title = "标题",
                         content = "预览",
                         createTime = System.currentTimeMillis()

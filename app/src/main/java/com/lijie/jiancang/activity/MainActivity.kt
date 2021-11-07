@@ -1,10 +1,11 @@
 package com.lijie.jiancang.activity
 
+import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.view.WindowCompat
@@ -12,11 +13,12 @@ import coil.annotation.ExperimentalCoilApi
 import com.lijie.jiancang.db.entity.CollectionType
 import com.lijie.jiancang.screen.Navigation
 import com.lijie.jiancang.screen.Screen
+import com.permissionx.guolindev.PermissionX
 
 @ExperimentalUnitApi
 @ExperimentalCoilApi
 @ExperimentalAnimationApi
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,19 +49,29 @@ class MainActivity : ComponentActivity() {
                 Pair("", CollectionType.Text)
             }
         }
-        if (content.isEmpty()) {
-            setContent {
-                Navigation(startDestination = Screen.MainScreen.route)
+        PermissionX.init(this)
+            .permissions(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            .request { allGranted, _, _ ->
+                if (allGranted) {
+                    if (content.isEmpty()) {
+                        setContent {
+                            Navigation(startDestination = Screen.MainScreen.route)
+                        }
+                    } else {
+                        setContent {
+                            Navigation(
+                                startDestination = Screen.AddCollectionScreen.route,
+                                collectionContent = content,
+                                collectionType = type
+                            )
+                        }
+                    }
+                }
             }
-        } else {
-            setContent {
-                Navigation(
-                    startDestination = Screen.AddCollectionScreen.route,
-                    collectionContent = content,
-                    collectionType = type
-                )
-            }
-        }
+
     }
 
 }

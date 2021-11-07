@@ -6,6 +6,7 @@ sealed class CollectionType(val type: Int) {
     object Text : CollectionType(0)
     object Image : CollectionType(1)
     object URL : CollectionType(2)
+    object MD : CollectionType(3)
 }
 
 @Entity(tableName = "collection")
@@ -13,6 +14,7 @@ data class Collection(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     var type: CollectionType,
+    var original: String,
     var title: String? = null,
     var content: String,
     var idea: String? = null,
@@ -45,6 +47,9 @@ class CollectionTypeConverter {
             CollectionType.URL.type -> {
                 CollectionType.URL
             }
+            CollectionType.MD.type -> {
+                CollectionType.MD
+            }
             else -> {
                 CollectionType.Text
             }
@@ -62,6 +67,9 @@ class CollectionTypeConverter {
             }
             CollectionType.URL -> {
                 CollectionType.URL.type
+            }
+            CollectionType.MD -> {
+                CollectionType.MD.type
             }
         }
     }
