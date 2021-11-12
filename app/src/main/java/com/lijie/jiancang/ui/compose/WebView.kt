@@ -16,7 +16,7 @@ import org.jsoup.Jsoup
 fun WebView(
     url: String,
     modifier: Modifier = Modifier,
-    onLoadComplete: (String, String) -> Unit
+    onLoadComplete: ((String, String) -> Unit)? = null
 ) {
 
     class InJavaScriptLocalObj {
@@ -33,7 +33,7 @@ fun WebView(
                 }
                 title = titleEle.getOrNull(0)?.attr("content") ?: ""
             }
-            onLoadComplete(title, newHtml)
+            onLoadComplete?.invoke(title, newHtml)
         }
 
     }

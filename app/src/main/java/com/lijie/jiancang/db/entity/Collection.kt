@@ -1,14 +1,24 @@
 package com.lijie.jiancang.db.entity
 
+import android.os.Parcelable
 import androidx.room.*
+import kotlinx.parcelize.Parcelize
 
-sealed class CollectionType(val type: Int) {
+sealed class CollectionType(val type: Int) : Parcelable {
+    @Parcelize
     object Text : CollectionType(0)
+
+    @Parcelize
     object Image : CollectionType(1)
+
+    @Parcelize
     object URL : CollectionType(2)
+
+    @Parcelize
     object MD : CollectionType(3)
 }
 
+@Parcelize
 @Entity(tableName = "collection")
 data class Collection(
     @PrimaryKey(autoGenerate = true)
@@ -22,8 +32,9 @@ data class Collection(
     var hasRead: Boolean = false,
     @ColumnInfo(name = "create_time")
     var createTime: Long = System.currentTimeMillis(),
-)
+) : Parcelable
 
+@Parcelize
 data class CollectionComplete(
     @Embedded var collection: Collection,
     @Relation(
@@ -31,7 +42,7 @@ data class CollectionComplete(
         entityColumn = "collection_id"
     )
     var labelQuote: List<LabelQuote>
-)
+) : Parcelable
 
 class CollectionTypeConverter {
 

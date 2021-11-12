@@ -33,6 +33,7 @@ import com.lijie.jiancang.ui.compose.WebView
 import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.AddCollectionViewModel
 import com.overzealous.remark.Remark
+import dev.jeziellago.compose.markdowntext.MarkdownText
 
 val LocalAddCollectionViewModel = staticCompositionLocalOf {
     AddCollectionViewModel()
@@ -49,9 +50,9 @@ fun AddCollectionScreen(
 ) {
     CompositionLocalProvider(LocalAddCollectionViewModel provides viewModel) {
         viewModel.setOriginal(content)
+        val onBackPressedDispatcher =
+            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
         Screen(topBar = {
-            val onBackPressedDispatcher =
-                LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
             TopAppBar(
                 title = { Text(text = "添加") },
                 navigationIcon = {
@@ -159,35 +160,35 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
         )
     }
     var editContent by remember { mutableStateOf(if (type == CollectionType.Text) content else url) }
-    var markDownContent by remember { mutableStateOf("") }
+    var htmlContent by remember { mutableStateOf("") }
     viewModel.setType(type)
     viewModel.setContent(editContent)
     Column(modifier = Modifier.fillMaxWidth()) {
         Box {
             if (type != CollectionType.Text) {
-                var showProgress by remember { mutableStateOf(false) }
+                var showProgress by remember { mutableStateOf(true) }
                 if (showProgress) {
                     ProgressDialog(onDismissRequest = { showProgress = false })
                 }
                 WebView(url = url, onLoadComplete = { title, html ->
                     onLoadComplete(title, html)
-                    markDownContent = Remark().convert(html)
-                    if (type == CollectionType.MD) {
-                        editContent = markDownContent
-                        viewModel.setContent(markDownContent)
-                    }
+                    htmlContent = html
                     showProgress = false
                 }, modifier = Modifier.size(1.dp))
             }
-            OutlinedTextField(
-                value = editContent,
-                onValueChange = {
-                    editContent = it
-                    viewModel.setContent(editContent)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = type == CollectionType.Text
-            )
+            if (type == CollectionType.MD) {
+                MarkdownText(markdown = editContent)
+            } else {
+                OutlinedTextField(
+                    value = editContent,
+                    onValueChange = {
+                        editContent = it
+                        viewModel.setContent(editContent)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = type == CollectionType.Text
+                )
+            }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(checked = type == CollectionType.Text, onCheckedChange = {
@@ -213,7 +214,7 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
             Checkbox(checked = type == CollectionType.MD, onCheckedChange = {
                 if (it) {
                     type = CollectionType.MD
-                    editContent = markDownContent
+                    editContent = Remark().convert(htmlContent)
                     viewModel.setType(type)
                     viewModel.setContent(editContent)
                 }

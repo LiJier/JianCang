@@ -9,12 +9,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import com.lijie.jiancang.ui.theme.JianCangTheme
 import com.lijie.jiancang.ui.compose.TopAppBar
+import com.lijie.jiancang.ui.theme.JianCangTheme
 
 sealed class Screen(val route: String) {
     object AddCollectionScreen : Screen("add_collection_screen")
     object MainScreen : Screen("main_screen")
+    object CollectionDetailScreen : Screen("collection_detail_screen")
 }
 
 @Composable

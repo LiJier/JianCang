@@ -1,9 +1,12 @@
 package com.lijie.jiancang.db.entity
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Entity(tableName = "label_quote")
 data class LabelQuote(
     @PrimaryKey(autoGenerate = true)
@@ -14,4 +17,4 @@ data class LabelQuote(
     val labelId: Long = 0,
     @ColumnInfo(name = "label_name")
     var labelName: String
-)
+) : Parcelable

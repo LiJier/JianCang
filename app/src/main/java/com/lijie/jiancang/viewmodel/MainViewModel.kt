@@ -29,7 +29,7 @@ class MainViewModel : ViewModel() {
 
     fun deleteCollection(collectionComplete: CollectionComplete) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (collectionComplete.collection.type == CollectionType.Image) {
+            if (collectionComplete.collection.type == CollectionType.Image || collectionComplete.collection.type == CollectionType.MD) {
                 File(collectionComplete.collection.content).delete()
             }
             AppDatabase.db.collectionDao().delete(collectionComplete.collection)

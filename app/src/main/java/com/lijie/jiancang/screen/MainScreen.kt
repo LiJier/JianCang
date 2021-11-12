@@ -41,7 +41,8 @@ val LocalMainViewModel = staticCompositionLocalOf {
 @ExperimentalCoilApi
 @Composable
 fun MainScreen(
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel = viewModel(),
+    onItemClick: (CollectionComplete) -> Unit
 ) {
     CompositionLocalProvider(LocalMainViewModel provides viewModel) {
         val context = LocalContext.current
@@ -54,7 +55,7 @@ fun MainScreen(
             if (collections.isNotEmpty()) {
                 LazyColumn(modifier = Modifier.padding(8.dp)) {
                     items(collections) {
-                        CollectionItem(it)
+                        CollectionItem(it, onItemClick)
                     }
                 }
             }
@@ -67,7 +68,10 @@ fun MainScreen(
 
 @ExperimentalCoilApi
 @Composable
-fun CollectionItem(collectionComplete: CollectionComplete) {
+fun CollectionItem(
+    collectionComplete: CollectionComplete,
+    onItemClick: (CollectionComplete) -> Unit
+) {
     val theme by LocalViewModel.current.themeFlow.collectAsState()
     val viewModel = LocalMainViewModel.current
     Box(
@@ -82,6 +86,9 @@ fun CollectionItem(collectionComplete: CollectionComplete) {
                     detectTapGestures(
                         onLongPress = {
                             viewModel.deleteCollection(collectionComplete)
+                        },
+                        onTap = {
+                            onItemClick.invoke(collectionComplete)
                         }
                     )
                 },
@@ -119,6 +126,9 @@ fun CollectionItem(collectionComplete: CollectionComplete) {
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.size(80.dp, 80.dp)
                         )
+                    }
+                    CollectionType.MD -> {
+                        Text(text = File(collection.content).name)
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -171,7 +181,7 @@ private fun Preview() {
                 )
             )
         )
-    })
+    }) {}
 }
 
 

@@ -18,6 +18,7 @@ package com.overzealous.remark.convert;
 
 import com.overzealous.remark.util.BlockWriter;
 
+import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Element;
 
 /**
@@ -35,7 +36,15 @@ public class Image extends AbstractNodeHandler {
      * @param converter Parent converter for this object.
      */
     public void handleNode(NodeHandler parent, Element node, DocumentConverter converter) {
-        String url = converter.cleaner.cleanUrl(node.attr("src"));
+        String url = "";
+        for (Attribute attribute : node.attributes().asList()) {
+            if (attribute.getKey().contains("src")) {
+                String value = converter.cleaner.cleanUrl(attribute.getValue());
+                if (value.startsWith("http")) {
+                    url = value;
+                }
+            }
+        }
         if (url.trim().isEmpty()) {
             return;
         }

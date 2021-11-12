@@ -14,6 +14,7 @@ import coil.annotation.ExperimentalCoilApi
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.lijie.jiancang.db.entity.CollectionComplete
 import com.lijie.jiancang.db.entity.CollectionType
 import com.lijie.jiancang.viewmodel.LocalViewModel
 
@@ -34,7 +35,7 @@ fun Navigation(
     collectionType: CollectionType = CollectionType.Text,
 ) {
     CompositionLocalProvider(LocalViewModel provides localViewModel) {
-        var arguments = bundleOf()
+        val arguments = bundleOf()
         AnimatedNavHost(navController = navController, startDestination = startDestination,
             enterTransition = {
                 slideInHorizontally(initialOffsetX = { 1000 })
@@ -52,8 +53,22 @@ fun Navigation(
                 AddCollectionScreen(content = collectionContent, type = collectionType)
             }
             composable(route = Screen.MainScreen.route) {
-                MainScreen()
+                MainScreen {
+                    arguments.putParcelable(COLLECTION_COMPLETE_KEY, it)
+                    navController.navigate(Screen.CollectionDetailScreen.route)
+                }
+            }
+            composable(route = Screen.CollectionDetailScreen.route) {
+                arguments.getParcelable<CollectionComplete>(
+                    COLLECTION_COMPLETE_KEY
+                )?.let {
+                    CollectionDetailScreen(
+                        collectionComplete = it
+                    )
+                }
             }
         }
     }
 }
+
+private const val COLLECTION_COMPLETE_KEY = "collection_complete_key"
