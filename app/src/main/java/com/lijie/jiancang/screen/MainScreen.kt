@@ -92,7 +92,7 @@ fun CollectionItem(
                         }
                     )
                 },
-            elevation = 1.dp
+            elevation = 4.dp
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(text = collectionComplete.collection.createTime.toTime(), fontSize = 10.sp)

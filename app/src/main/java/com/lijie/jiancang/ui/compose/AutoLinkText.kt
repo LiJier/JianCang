@@ -63,7 +63,9 @@ fun AutoLinkText(
                     .firstOrNull()?.let { stringAnnotation ->
                         annotatedLinkString = text.annotationUrl()
                         uriHandler.openUri(stringAnnotation.item)
-                    }
+                    } ?: run {
+
+                }
             }
         }
     }

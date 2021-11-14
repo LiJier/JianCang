@@ -35,7 +35,7 @@ import com.lijie.jiancang.viewmodel.AddCollectionViewModel
 import com.overzealous.remark.Remark
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
-val LocalAddCollectionViewModel = staticCompositionLocalOf {
+private val LocalAddCollectionViewModel = staticCompositionLocalOf {
     AddCollectionViewModel()
 }
 
@@ -71,8 +71,10 @@ fun AddCollectionScreen(
                     val save by viewModel.saved.collectAsState()
                     when (save) {
                         true -> {
-                            "保存成功".toast()
-                            onBackPressedDispatcher?.onBackPressed()
+                            LaunchedEffect(Unit) {
+                                "保存成功".toast()
+                                onBackPressedDispatcher?.onBackPressed()
+                            }
                         }
                         false -> {
                             "保存失败".toast()

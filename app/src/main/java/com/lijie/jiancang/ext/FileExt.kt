@@ -41,14 +41,24 @@ suspend fun saveImage(
 
 suspend fun saveMarkdown(
     title: String,
-    markdown: String
+    markdown: String,
+    overwrite: Boolean
 ): File? {
     return withContext(Dispatchers.IO) {
         markDownFolder?.let { markDownFolder ->
-            val name = "$title.md"
+            val extension = FileUtils.getExtension(title)
+            val name = if (extension.isEmpty()) {
+                "$title.md"
+            } else {
+                if (extension == "md") {
+                    title
+                } else {
+                    FileUtils.changeFileExtension(title, '.', "md")
+                }
+            }
             val file = File(markDownFolder + name)
             markdown.byteInputStream().use {
-                FileUtils.write2File(it, file, false)
+                FileUtils.write2File(it, file, overwrite)
             } ?: run {
                 null
             }

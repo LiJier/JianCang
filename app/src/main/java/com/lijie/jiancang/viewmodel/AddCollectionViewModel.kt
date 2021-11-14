@@ -87,7 +87,7 @@ class AddCollectionViewModel : ViewModel() {
                     val mdFile = saveMarkdown(
                         collection.title ?: collection.original.substring(
                             0, if (collection.original.length > 6) 6 else collection.original.length
-                        ), collection.content
+                        ), collection.content, false
                     )
                     mdFile?.let {
                         setContent(it.path)
