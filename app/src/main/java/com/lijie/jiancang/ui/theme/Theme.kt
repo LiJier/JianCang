@@ -7,9 +7,6 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.lijie.jiancang.screen.LocalViewModel
 
 val DarkColorPalette = darkColors(
@@ -35,21 +32,16 @@ val LightColorPalette = lightColors(
 
 @Composable
 fun JianCangTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    ProvideWindowInsets {
-        if (darkTheme) {
-            LocalViewModel.current.setTheme(DarkColorPalette)
-        } else {
-            LocalViewModel.current.setTheme(LightColorPalette)
-        }
-        val theme by LocalViewModel.current.themeFlow.collectAsState()
-        rememberSystemUiController().setStatusBarColor(
-            Color.Transparent
-        )
-        MaterialTheme(
-            colors = theme,
-            typography = Typography,
-            shapes = Shapes,
-            content = content
-        )
+    if (darkTheme) {
+        LocalViewModel.current.setTheme(DarkColorPalette)
+    } else {
+        LocalViewModel.current.setTheme(LightColorPalette)
     }
+    val theme by LocalViewModel.current.themeFlow.collectAsState()
+    MaterialTheme(
+        colors = theme,
+        typography = Typography,
+        shapes = Shapes,
+        content = content
+    )
 }

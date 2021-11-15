@@ -9,6 +9,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.theme.JianCangTheme
 
@@ -42,26 +44,29 @@ fun Screen(
     }
 ) {
     JianCangTheme {
-        Scaffold(
-            modifier = modifier,
-            scaffoldState = scaffoldState,
-            topBar = topBar,
-            bottomBar = bottomBar,
-            snackbarHost = snackbarHost,
-            floatingActionButton = floatingActionButton,
-            floatingActionButtonPosition = floatingActionButtonPosition,
-            isFloatingActionButtonDocked = isFloatingActionButtonDocked,
-            drawerContent = drawerContent,
-            drawerGesturesEnabled = drawerGesturesEnabled,
-            drawerShape = drawerShape,
-            drawerElevation = drawerElevation,
-            drawerBackgroundColor = drawerBackgroundColor,
-            drawerContentColor = drawerContentColor,
-            drawerScrimColor = drawerScrimColor,
-            backgroundColor = backgroundColor,
-            contentColor = contentColor,
-            content = content
-        )
+        ProvideWindowInsets(consumeWindowInsets = false) {
+            rememberSystemUiController().setStatusBarColor(Color.Transparent)
+            Scaffold(
+                modifier = modifier,
+                scaffoldState = scaffoldState,
+                topBar = topBar,
+                bottomBar = bottomBar,
+                snackbarHost = snackbarHost,
+                floatingActionButton = floatingActionButton,
+                floatingActionButtonPosition = floatingActionButtonPosition,
+                isFloatingActionButtonDocked = isFloatingActionButtonDocked,
+                drawerContent = drawerContent,
+                drawerGesturesEnabled = drawerGesturesEnabled,
+                drawerShape = drawerShape,
+                drawerElevation = drawerElevation,
+                drawerBackgroundColor = drawerBackgroundColor,
+                drawerContentColor = drawerContentColor,
+                drawerScrimColor = drawerScrimColor,
+                backgroundColor = backgroundColor,
+                contentColor = contentColor,
+                content = content
+            )
+        }
     }
 }
 

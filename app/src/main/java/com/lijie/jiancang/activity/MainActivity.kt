@@ -7,6 +7,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.view.WindowCompat
 import coil.annotation.ExperimentalCoilApi
@@ -15,6 +17,8 @@ import com.lijie.jiancang.screen.Navigation
 import com.lijie.jiancang.screen.Screen
 import com.permissionx.guolindev.PermissionX
 
+@ExperimentalFoundationApi
+@ExperimentalComposeUiApi
 @ExperimentalUnitApi
 @ExperimentalCoilApi
 @ExperimentalAnimationApi
@@ -23,6 +27,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+//        setContent {
+//            Screen {
+//                Column(modifier = Modifier.navigationBarsWithImePadding()) {
+//                    var text by remember { mutableStateOf("") }
+//                    OutlinedTextField(
+//                        value = text,
+//                        onValueChange = {
+//                            text = it
+//                        })
+//                    Spacer(modifier = Modifier.weight(1F))
+//                    Button(onClick = { }) {
+//
+//                    }
+//                }
+//            }
+//        }
         val (content, type) = when (intent.action) {
             Intent.ACTION_PROCESS_TEXT -> {
                 val s = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString()
@@ -71,7 +91,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-
     }
 
 }
