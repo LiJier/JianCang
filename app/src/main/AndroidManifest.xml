@@ -36,9 +36,6 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.DetailsActivity"
-            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

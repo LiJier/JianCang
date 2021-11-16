@@ -3,10 +3,13 @@ package com.lijie.jiancang.screen
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
@@ -15,21 +18,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
-import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.lijie.jiancang.db.entity.Collection
 import com.lijie.jiancang.db.entity.CollectionComplete
 import com.lijie.jiancang.db.entity.CollectionType
 import com.lijie.jiancang.db.entity.LabelQuote
 import com.lijie.jiancang.ext.toast
-import com.lijie.jiancang.ui.compose.AutoLinkText
-import com.lijie.jiancang.ui.compose.TopAppBar
-import com.lijie.jiancang.ui.compose.WebView
+import com.lijie.jiancang.ui.compose.*
 import com.lijie.jiancang.viewmodel.CollectionDetailsViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import java.io.File
@@ -47,7 +50,10 @@ fun CollectionDetailScreen(
     viewModel: CollectionDetailsViewModel = viewModel(),
     collectionComplete: CollectionComplete
 ) {
-    CompositionLocalProvider(LocalCollectionDetailsViewModel provides viewModel) {
+    CompositionLocalProvider(
+        LocalCollectionDetailsViewModel provides viewModel,
+        LocalSelectionTop provides SelectionTop(0)
+    ) {
         val onBackPressedDispatcher =
             LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
         viewModel.setCollectionComplete(collectionComplete)
@@ -91,28 +97,79 @@ fun CollectionDetailScreen(
                     }
                 })
         }, modifier = Modifier.fillMaxSize()) {
-            LazyColumn(
+            var height by remember { mutableStateOf(0) }
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .navigationBarsWithImePadding()
+                    .onSizeChanged { height = it.height }
             ) {
-                item {
-                    when (collectionComplete.collection.type) {
-                        CollectionType.Image -> {
-                            ImageContent(collectionComplete = collectionComplete)
-                        }
-                        CollectionType.MD -> {
-                            val mdString = File(collectionComplete.collection.content).readText()
-                            viewModel.setNewContent(mdString)
-                            MDContent(mdString, isEdit)
-                        }
-                        CollectionType.Text -> {
-                            TextContent(collectionComplete = collectionComplete, isEdit)
-                        }
-                        CollectionType.URL -> {
-                            URLContent(collectionComplete = collectionComplete)
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+//                    val view = LocalView.current
+//                    var isVisible by remember { mutableStateOf(false) }
+//                    var imeBottom by remember { mutableStateOf(0) }
+//                    var maxImeBottom by remember { mutableStateOf(0) }
+                    val scrollState = rememberScrollState()
+//                    ViewCompat.setOnApplyWindowInsetsListener(
+//                        view,
+//                        OnApplyWindowInsetsListener { _, wic ->
+//                            isVisible = wic.isVisible(WindowInsetsCompat.Type.ime())
+//                            return@OnApplyWindowInsetsListener wic
+//                        })
+//                    ViewCompat.setWindowInsetsAnimationCallback(view, object :
+//                        WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
+//
+//                        override fun onProgress(
+//                            wic: WindowInsetsCompat,
+//                            runningAnimations: MutableList<WindowInsetsAnimationCompat>
+//                        ): WindowInsetsCompat {
+//                            imeBottom = wic.getInsets(WindowInsetsCompat.Type.ime()).bottom
+//                            return wic
+//                        }
+//
+//                    })
+//                    LaunchedEffect(imeBottom) {
+//                        if (maxImeBottom < imeBottom) {
+//                            maxImeBottom = imeBottom
+//                        }
+//                        val top = viewModel.selectionLineTop
+//                        val value = scrollState.value
+//                        if (isVisible) {
+//                            if ((top - value) > maxImeBottom) {
+//                                val to = (maxImeBottom - (height - (top - value))) + 200
+//                                scrollState.animateScrollTo(
+//                                    (scrollState.value + to).toInt(),
+//                                    SpringSpec(stiffness = StiffnessHigh)
+//                                )
+//                            }
+//                        }
+//                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1F)
+                            .imeScroll(height, scrollState)
+                    ) {
+                        when (collectionComplete.collection.type) {
+                            CollectionType.Image -> {
+                                ImageContent(collectionComplete = collectionComplete)
+                            }
+                            CollectionType.MD -> {
+                                val mdString =
+                                    File(collectionComplete.collection.content).readText()
+                                viewModel.setNewContent(mdString)
+                                MDContent(mdString, isEdit)
+                            }
+                            CollectionType.Text -> {
+                                TextContent(collectionComplete = collectionComplete, isEdit)
+                            }
+                            CollectionType.URL -> {
+                                URLContent(collectionComplete = collectionComplete)
+                            }
                         }
                     }
+                    Spacer(modifier = Modifier.imeHeight())
                 }
             }
         }
@@ -124,10 +181,12 @@ private fun TextContent(collectionComplete: CollectionComplete, isEdit: Boolean)
     val viewModel = LocalCollectionDetailsViewModel.current
     if (isEdit) {
         var text by remember { mutableStateOf(collectionComplete.collection.content) }
-        TextField(value = text, onValueChange = {
-            text = it
-            viewModel.setNewContent(text)
-        })
+        OutlinedTextField(
+            value = text, onValueChange = {
+                text = it
+                viewModel.setNewContent(text)
+            }
+        )
     } else {
         AutoLinkText(text = collectionComplete.collection.content)
     }
@@ -151,12 +210,20 @@ private fun ImageContent(collectionComplete: CollectionComplete) {
 private fun MDContent(mdString: String, isEdit: Boolean) {
     val viewModel = LocalCollectionDetailsViewModel.current
     if (isEdit) {
-        var text by remember { mutableStateOf(mdString) }
-        OutlinedTextField(
+        var text by remember { mutableStateOf(TextFieldValue(mdString)) }
+        val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+        val selectionTop = LocalSelectionTop.current
+        BasicTextField(
             value = text,
             onValueChange = {
                 text = it
-                viewModel.setNewContent(text)
+                it.selection
+                viewModel.setNewContent(it.text)
+                val line = layoutResult.value?.getLineForOffset(it.selection.start) ?: 0
+                val top = layoutResult.value?.getLineTop(line) ?: 0F
+                selectionTop.value = top.toInt()
+            }, onTextLayout = {
+                layoutResult.value = it
             })
     } else {
         MarkdownText(markdown = mdString)
