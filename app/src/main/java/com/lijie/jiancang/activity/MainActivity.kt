@@ -33,22 +33,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-//        setContent {
-//            Screen {
-//                Column(modifier = Modifier.navigationBarsWithImePadding()) {
-//                    var text by remember { mutableStateOf("") }
-//                    OutlinedTextField(
-//                        value = text,
-//                        onValueChange = {
-//                            text = it
-//                        })
-//                    Spacer(modifier = Modifier.weight(1F))
-//                    Button(onClick = { }) {
-//
-//                    }
-//                }
-//            }
-//        }
         val (content, type) = when (intent.action) {
             Intent.ACTION_PROCESS_TEXT -> {
                 val s = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString()

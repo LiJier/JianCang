@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.lijie.jiancang.ui.compose.TopAppBar
-import com.lijie.jiancang.ui.theme.JianCangTheme
 
 sealed class Screen(val route: String)
 
@@ -37,28 +36,26 @@ fun Screen(
         Text(text = "content")
     }
 ) {
-    JianCangTheme {
-        Scaffold(
-            modifier = modifier,
-            scaffoldState = scaffoldState,
-            topBar = topBar,
-            bottomBar = bottomBar,
-            snackbarHost = snackbarHost,
-            floatingActionButton = floatingActionButton,
-            floatingActionButtonPosition = floatingActionButtonPosition,
-            isFloatingActionButtonDocked = isFloatingActionButtonDocked,
-            drawerContent = drawerContent,
-            drawerGesturesEnabled = drawerGesturesEnabled,
-            drawerShape = drawerShape,
-            drawerElevation = drawerElevation,
-            drawerBackgroundColor = drawerBackgroundColor,
-            drawerContentColor = drawerContentColor,
-            drawerScrimColor = drawerScrimColor,
-            backgroundColor = backgroundColor,
-            contentColor = contentColor,
-            content = content
-        )
-    }
+    Scaffold(
+        modifier = modifier,
+        scaffoldState = scaffoldState,
+        topBar = topBar,
+        bottomBar = bottomBar,
+        snackbarHost = snackbarHost,
+        floatingActionButton = floatingActionButton,
+        floatingActionButtonPosition = floatingActionButtonPosition,
+        isFloatingActionButtonDocked = isFloatingActionButtonDocked,
+        drawerContent = drawerContent,
+        drawerGesturesEnabled = drawerGesturesEnabled,
+        drawerShape = drawerShape,
+        drawerElevation = drawerElevation,
+        drawerBackgroundColor = drawerBackgroundColor,
+        drawerContentColor = drawerContentColor,
+        drawerScrimColor = drawerScrimColor,
+        backgroundColor = backgroundColor,
+        contentColor = contentColor,
+        content = content
+    )
 }
 
 @Preview
