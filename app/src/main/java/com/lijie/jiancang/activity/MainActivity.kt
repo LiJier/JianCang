@@ -8,21 +8,27 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.view.WindowCompat
 import coil.annotation.ExperimentalCoilApi
+import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.lijie.jiancang.db.entity.CollectionType
+import com.lijie.jiancang.screen.AddCollectionScreen
+import com.lijie.jiancang.screen.MainScreen
 import com.lijie.jiancang.screen.Navigation
-import com.lijie.jiancang.screen.Screen
 import com.permissionx.guolindev.PermissionX
 
+@ExperimentalMaterialApi
+@ExperimentalAnimatedInsets
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @ExperimentalUnitApi
 @ExperimentalCoilApi
 @ExperimentalAnimationApi
 class MainActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,12 +84,12 @@ class MainActivity : AppCompatActivity() {
                 if (allGranted) {
                     if (content.isEmpty()) {
                         setContent {
-                            Navigation(startDestination = Screen.MainScreen.route)
+                            Navigation(startDestination = MainScreen.route)
                         }
                     } else {
                         setContent {
                             Navigation(
-                                startDestination = Screen.AddCollectionScreen.route,
+                                startDestination = AddCollectionScreen.route,
                                 collectionContent = content,
                                 collectionType = type
                             )

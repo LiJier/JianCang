@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -34,10 +35,13 @@ import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.MainViewModel
 import java.io.File
 
+object MainScreen : Screen("main_screen")
+
 val LocalMainViewModel = staticCompositionLocalOf {
     MainViewModel()
 }
 
+@ExperimentalMaterialApi
 @ExperimentalCoilApi
 @Composable
 fun MainScreen(
@@ -50,6 +54,8 @@ fun MainScreen(
             TopAppBar(
                 title = { Text(text = context.getString(R.string.app_name)) }
             )
+        }, drawerContent = {
+            MainDrawerContent()
         }) {
             val collections by viewModel.collections.collectAsState()
             if (collections.isNotEmpty()) {
@@ -152,10 +158,11 @@ fun CollectionItem(
     }
 }
 
+@ExperimentalMaterialApi
 @ExperimentalCoilApi
 @Preview
 @Composable
-private fun Preview() {
+fun MainPreview() {
     MainScreen(MainViewModel().apply {
         setCollections(
             listOf(

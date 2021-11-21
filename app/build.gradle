@@ -27,8 +27,8 @@ android {
     }
     signingConfigs {
         config {
-            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
-//            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
+//            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
+            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
             storePassword 'lj37927'
             keyAlias 'lj'
             keyPassword 'lj37927'
@@ -73,7 +73,7 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
     implementation 'androidx.activity:activity-compose:1.4.0'
-    implementation "androidx.navigation:navigation-compose:2.4.0-beta01"
+    implementation "androidx.navigation:navigation-compose:2.4.0-beta02"
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.0-rc01"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0"
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"

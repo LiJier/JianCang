@@ -37,6 +37,8 @@ import com.lijie.jiancang.viewmodel.CollectionDetailsViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import java.io.File
 
+object CollectionDetailScreen : Screen("collection_detail_screen")
+
 private val LocalCollectionDetailsViewModel = staticCompositionLocalOf {
     CollectionDetailsViewModel()
 }
@@ -51,8 +53,7 @@ fun CollectionDetailScreen(
     collectionComplete: CollectionComplete
 ) {
     CompositionLocalProvider(
-        LocalCollectionDetailsViewModel provides viewModel,
-        LocalSelectionTop provides SelectionTop(0)
+        LocalCollectionDetailsViewModel provides viewModel
     ) {
         val onBackPressedDispatcher =
             LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -91,6 +92,7 @@ fun CollectionDetailScreen(
                                     false -> {
                                         "保存失败".toast()
                                     }
+                                    else -> {}
                                 }
                             }
                         }
@@ -106,45 +108,7 @@ fun CollectionDetailScreen(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
-//                    val view = LocalView.current
-//                    var isVisible by remember { mutableStateOf(false) }
-//                    var imeBottom by remember { mutableStateOf(0) }
-//                    var maxImeBottom by remember { mutableStateOf(0) }
                     val scrollState = rememberScrollState()
-//                    ViewCompat.setOnApplyWindowInsetsListener(
-//                        view,
-//                        OnApplyWindowInsetsListener { _, wic ->
-//                            isVisible = wic.isVisible(WindowInsetsCompat.Type.ime())
-//                            return@OnApplyWindowInsetsListener wic
-//                        })
-//                    ViewCompat.setWindowInsetsAnimationCallback(view, object :
-//                        WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
-//
-//                        override fun onProgress(
-//                            wic: WindowInsetsCompat,
-//                            runningAnimations: MutableList<WindowInsetsAnimationCompat>
-//                        ): WindowInsetsCompat {
-//                            imeBottom = wic.getInsets(WindowInsetsCompat.Type.ime()).bottom
-//                            return wic
-//                        }
-//
-//                    })
-//                    LaunchedEffect(imeBottom) {
-//                        if (maxImeBottom < imeBottom) {
-//                            maxImeBottom = imeBottom
-//                        }
-//                        val top = viewModel.selectionLineTop
-//                        val value = scrollState.value
-//                        if (isVisible) {
-//                            if ((top - value) > maxImeBottom) {
-//                                val to = (maxImeBottom - (height - (top - value))) + 200
-//                                scrollState.animateScrollTo(
-//                                    (scrollState.value + to).toInt(),
-//                                    SpringSpec(stiffness = StiffnessHigh)
-//                                )
-//                            }
-//                        }
-//                    }
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -212,7 +176,6 @@ private fun MDContent(mdString: String, isEdit: Boolean) {
     if (isEdit) {
         var text by remember { mutableStateOf(TextFieldValue(mdString)) }
         val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-        val selectionTop = LocalSelectionTop.current
         BasicTextField(
             value = text,
             onValueChange = {
@@ -221,7 +184,7 @@ private fun MDContent(mdString: String, isEdit: Boolean) {
                 viewModel.setNewContent(it.text)
                 val line = layoutResult.value?.getLineForOffset(it.selection.start) ?: 0
                 val top = layoutResult.value?.getLineTop(line) ?: 0F
-                selectionTop.value = top.toInt()
+                selectionTop = top.toInt()
             }, onTextLayout = {
                 layoutResult.value = it
             })
@@ -242,7 +205,7 @@ private fun URLContent(collectionComplete: CollectionComplete) {
 @ExperimentalUnitApi
 @Preview
 @Composable
-private fun Preview() {
+fun CollectionDetailPreview() {
     CollectionDetailScreen(
         CollectionDetailsViewModel(),
         CollectionComplete(

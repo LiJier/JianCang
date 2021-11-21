@@ -35,6 +35,8 @@ import com.lijie.jiancang.viewmodel.AddCollectionViewModel
 import com.overzealous.remark.Remark
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
+object AddCollectionScreen : Screen("add_collection_screen")
+
 private val LocalAddCollectionViewModel = staticCompositionLocalOf {
     AddCollectionViewModel()
 }
@@ -254,7 +256,7 @@ fun LabelsFlow(labels: List<Label>) {
 @ExperimentalCoilApi
 @Preview
 @Composable
-private fun Preview() {
+fun AddCollectionPreview() {
     AddCollectionScreen(AddCollectionViewModel().apply {
         setLabels(
             arrayListOf(

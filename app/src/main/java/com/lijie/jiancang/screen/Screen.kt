@@ -12,11 +12,7 @@ import androidx.compose.ui.unit.Dp
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.theme.JianCangTheme
 
-sealed class Screen(val route: String) {
-    object AddCollectionScreen : Screen("add_collection_screen")
-    object MainScreen : Screen("main_screen")
-    object CollectionDetailScreen : Screen("collection_detail_screen")
-}
+sealed class Screen(val route: String)
 
 @Composable
 fun Screen(

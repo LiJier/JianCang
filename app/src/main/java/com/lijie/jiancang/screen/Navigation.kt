@@ -4,6 +4,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -26,6 +27,7 @@ val LocalViewModel = staticCompositionLocalOf {
     LocalViewModel()
 }
 
+@ExperimentalMaterialApi
 @ExperimentalAnimatedInsets
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
@@ -55,16 +57,16 @@ fun Navigation(
             popExitTransition = {
                 slideOutHorizontally(targetOffsetX = { 1000 })
             }) {
-            composable(route = Screen.AddCollectionScreen.route) {
+            composable(route = AddCollectionScreen.route) {
                 AddCollectionScreen(content = collectionContent, type = collectionType)
             }
-            composable(route = Screen.MainScreen.route) {
+            composable(route = MainScreen.route) {
                 MainScreen {
                     arguments.putParcelable(COLLECTION_COMPLETE_KEY, it)
-                    navController.navigate(Screen.CollectionDetailScreen.route)
+                    navController.navigate(CollectionDetailScreen.route)
                 }
             }
-            composable(route = Screen.CollectionDetailScreen.route) {
+            composable(route = CollectionDetailScreen.route) {
                 arguments.getParcelable<CollectionComplete>(
                     COLLECTION_COMPLETE_KEY
                 )?.let {
