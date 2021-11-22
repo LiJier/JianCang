@@ -14,11 +14,12 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.view.WindowCompat
 import coil.annotation.ExperimentalCoilApi
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
-import com.lijie.jiancang.db.entity.CollectionType
+import com.lijie.jiancang.data.db.entity.CollectionType
 import com.lijie.jiancang.screen.AddCollectionScreen
 import com.lijie.jiancang.screen.MainScreen
 import com.lijie.jiancang.screen.Navigation
 import com.permissionx.guolindev.PermissionX
+import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalMaterialApi
 @ExperimentalAnimatedInsets
@@ -27,6 +28,7 @@ import com.permissionx.guolindev.PermissionX
 @ExperimentalUnitApi
 @ExperimentalCoilApi
 @ExperimentalAnimationApi
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
 
@@ -53,6 +55,14 @@ class MainActivity : AppCompatActivity() {
                     else -> {
                         Pair("", CollectionType.Text)
                     }
+                }
+            }
+            Intent.ACTION_VIEW -> {
+                if (intent.categories.contains(Intent.CATEGORY_BROWSABLE)) {
+                    val s = intent.dataString ?: ""
+                    Pair(s, CollectionType.Text)
+                } else {
+                    Pair("", CollectionType.Text)
                 }
             }
             else -> {

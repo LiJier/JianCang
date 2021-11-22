@@ -1,4 +1,4 @@
-package com.lijie.jiancang.db.entity
+package com.lijie.jiancang.data.db.entity
 
 import android.os.Parcelable
 import androidx.room.*

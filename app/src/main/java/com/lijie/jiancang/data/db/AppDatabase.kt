@@ -1,17 +1,17 @@
-package com.lijie.jiancang.db
+package com.lijie.jiancang.data.db
 
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.lijie.jiancang.App
-import com.lijie.jiancang.db.dao.CollectionDao
-import com.lijie.jiancang.db.dao.LabelDao
-import com.lijie.jiancang.db.dao.LabelQuoteDao
-import com.lijie.jiancang.db.entity.Collection
-import com.lijie.jiancang.db.entity.CollectionTypeConverter
-import com.lijie.jiancang.db.entity.Label
-import com.lijie.jiancang.db.entity.LabelQuote
+import com.lijie.jiancang.data.db.dao.CollectionDao
+import com.lijie.jiancang.data.db.dao.LabelDao
+import com.lijie.jiancang.data.db.dao.LabelQuoteDao
+import com.lijie.jiancang.data.db.entity.Collection
+import com.lijie.jiancang.data.db.entity.CollectionTypeConverter
+import com.lijie.jiancang.data.db.entity.Label
+import com.lijie.jiancang.data.db.entity.LabelQuote
 
 @Database(
     entities = [Collection::class, Label::class, LabelQuote::class],

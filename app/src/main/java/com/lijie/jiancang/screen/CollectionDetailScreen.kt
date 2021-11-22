@@ -5,7 +5,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
@@ -23,14 +22,15 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
-import com.lijie.jiancang.db.entity.Collection
-import com.lijie.jiancang.db.entity.CollectionComplete
-import com.lijie.jiancang.db.entity.CollectionType
-import com.lijie.jiancang.db.entity.LabelQuote
+import com.lijie.jiancang.data.db.entity.Collection
+import com.lijie.jiancang.data.db.entity.CollectionComplete
+import com.lijie.jiancang.data.db.entity.CollectionType
+import com.lijie.jiancang.data.db.entity.LabelQuote
 import com.lijie.jiancang.ext.toast
 import com.lijie.jiancang.ui.compose.*
 import com.lijie.jiancang.viewmodel.CollectionDetailsViewModel
@@ -100,41 +100,38 @@ fun CollectionDetailScreen(
                 })
         }, modifier = Modifier.fillMaxSize()) {
             var height by remember { mutableStateOf(0) }
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .onSizeChanged { height = it.height }
             ) {
+                val scrollState = rememberScrollState()
                 Column(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1F)
+                        .padding(8.dp)
+                        .imeScroll(height, scrollState)
                 ) {
-                    val scrollState = rememberScrollState()
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1F)
-                            .imeScroll(height, scrollState)
-                    ) {
-                        when (collectionComplete.collection.type) {
-                            CollectionType.Image -> {
-                                ImageContent(collectionComplete = collectionComplete)
-                            }
-                            CollectionType.MD -> {
-                                val mdString =
-                                    File(collectionComplete.collection.content).readText()
-                                viewModel.setNewContent(mdString)
-                                MDContent(mdString, isEdit)
-                            }
-                            CollectionType.Text -> {
-                                TextContent(collectionComplete = collectionComplete, isEdit)
-                            }
-                            CollectionType.URL -> {
-                                URLContent(collectionComplete = collectionComplete)
-                            }
+                    when (collectionComplete.collection.type) {
+                        CollectionType.Image -> {
+                            ImageContent(collectionComplete = collectionComplete)
+                        }
+                        CollectionType.MD -> {
+                            val mdString =
+                                File(collectionComplete.collection.content).readText()
+                            viewModel.setNewContent(mdString)
+                            MDContent(mdString, isEdit)
+                        }
+                        CollectionType.Text -> {
+                            TextContent(collectionComplete = collectionComplete, isEdit)
+                        }
+                        CollectionType.URL -> {
+                            URLContent(collectionComplete = collectionComplete)
                         }
                     }
-                    Spacer(modifier = Modifier.imeHeight())
                 }
+                Spacer(modifier = Modifier.imeHeight())
             }
         }
     }
@@ -176,7 +173,7 @@ private fun MDContent(mdString: String, isEdit: Boolean) {
     if (isEdit) {
         var text by remember { mutableStateOf(TextFieldValue(mdString)) }
         val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-        BasicTextField(
+        StyledTextField(
             value = text,
             onValueChange = {
                 text = it

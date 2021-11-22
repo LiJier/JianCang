@@ -1,4 +1,4 @@
-package com.lijie.jiancang.db.dao
+package com.lijie.jiancang.data.db.dao
 
 import androidx.room.*
 

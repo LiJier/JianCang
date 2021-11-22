@@ -23,8 +23,8 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.flowlayout.FlowRow
-import com.lijie.jiancang.db.entity.CollectionType
-import com.lijie.jiancang.db.entity.Label
+import com.lijie.jiancang.data.db.entity.CollectionType
+import com.lijie.jiancang.data.db.entity.Label
 import com.lijie.jiancang.ext.findUrl
 import com.lijie.jiancang.ext.toast
 import com.lijie.jiancang.ui.compose.ProgressDialog
@@ -230,7 +230,7 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
 
 @Composable
 fun LabelsFlow(labels: List<Label>) {
-    val theme by LocalViewModel.current.themeFlow.collectAsState()
+    val theme by LocalViewModel.current.theme.collectAsState()
     FlowRow(mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
         labels.forEach { label ->
             var check by remember { mutableStateOf(label.check) }

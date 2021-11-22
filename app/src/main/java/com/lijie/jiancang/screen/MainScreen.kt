@@ -24,10 +24,10 @@ import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.flowlayout.FlowRow
 import com.lijie.jiancang.R
-import com.lijie.jiancang.db.entity.Collection
-import com.lijie.jiancang.db.entity.CollectionComplete
-import com.lijie.jiancang.db.entity.CollectionType
-import com.lijie.jiancang.db.entity.LabelQuote
+import com.lijie.jiancang.data.db.entity.Collection
+import com.lijie.jiancang.data.db.entity.CollectionComplete
+import com.lijie.jiancang.data.db.entity.CollectionType
+import com.lijie.jiancang.data.db.entity.LabelQuote
 import com.lijie.jiancang.ext.toTime
 import com.lijie.jiancang.ui.compose.AutoLinkText
 import com.lijie.jiancang.ui.compose.TopAppBar
@@ -78,7 +78,7 @@ fun CollectionItem(
     collectionComplete: CollectionComplete,
     onItemClick: (CollectionComplete) -> Unit
 ) {
-    val theme by LocalViewModel.current.themeFlow.collectAsState()
+    val theme by LocalViewModel.current.theme.collectAsState()
     val viewModel = LocalMainViewModel.current
     Box(
         modifier = Modifier

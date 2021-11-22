@@ -18,8 +18,8 @@ import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.lijie.jiancang.db.entity.CollectionComplete
-import com.lijie.jiancang.db.entity.CollectionType
+import com.lijie.jiancang.data.db.entity.CollectionComplete
+import com.lijie.jiancang.data.db.entity.CollectionType
 import com.lijie.jiancang.ui.theme.JianCangTheme
 import com.lijie.jiancang.viewmodel.LocalViewModel
 

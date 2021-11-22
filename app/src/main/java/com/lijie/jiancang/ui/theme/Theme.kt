@@ -35,12 +35,13 @@ val LightColorPalette = lightColors(
 
 @Composable
 fun JianCangTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+    val localViewModel = LocalViewModel.current
+    val theme by localViewModel.theme.collectAsState()
     if (darkTheme) {
-        LocalViewModel.current.setTheme(DarkColorPalette)
+        localViewModel.setTheme(DarkColorPalette)
     } else {
-        LocalViewModel.current.setTheme(LightColorPalette)
+        localViewModel.setTheme(LightColorPalette)
     }
-    val theme by LocalViewModel.current.themeFlow.collectAsState()
     ProvideWindowInsets {
         rememberSystemUiController().setStatusBarColor(Color.Transparent)
         MaterialTheme(

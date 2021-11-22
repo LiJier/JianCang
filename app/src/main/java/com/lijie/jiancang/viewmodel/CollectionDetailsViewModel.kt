@@ -2,9 +2,9 @@ package com.lijie.jiancang.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lijie.jiancang.db.AppDatabase
-import com.lijie.jiancang.db.entity.CollectionComplete
-import com.lijie.jiancang.db.entity.CollectionType
+import com.lijie.jiancang.data.db.AppDatabase
+import com.lijie.jiancang.data.db.entity.CollectionComplete
+import com.lijie.jiancang.data.db.entity.CollectionType
 import com.lijie.jiancang.ext.saveMarkdown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

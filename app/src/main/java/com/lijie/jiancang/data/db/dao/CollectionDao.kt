@@ -1,10 +1,10 @@
-package com.lijie.jiancang.db.dao
+package com.lijie.jiancang.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.lijie.jiancang.db.entity.Collection
-import com.lijie.jiancang.db.entity.CollectionComplete
+import com.lijie.jiancang.data.db.entity.Collection
+import com.lijie.jiancang.data.db.entity.CollectionComplete
 
 @Dao
 interface CollectionDao : IDao<Collection> {

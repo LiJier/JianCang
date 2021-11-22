@@ -1,8 +1,8 @@
-package com.lijie.jiancang.db.dao
+package com.lijie.jiancang.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.lijie.jiancang.db.entity.Label
+import com.lijie.jiancang.data.db.entity.Label
 
 @Dao
 interface LabelDao : IDao<Label> {
