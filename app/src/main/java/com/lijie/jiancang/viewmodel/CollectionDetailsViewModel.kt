@@ -2,22 +2,26 @@ package com.lijie.jiancang.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lijie.jiancang.data.db.AppDatabase
+import com.lijie.jiancang.data.Result
 import com.lijie.jiancang.data.db.entity.CollectionComplete
 import com.lijie.jiancang.data.db.entity.CollectionType
-import com.lijie.jiancang.ext.saveMarkdown
+import com.lijie.jiancang.data.source.ICollectionRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
+import javax.inject.Inject
 
-class CollectionDetailsViewModel : ViewModel() {
+@HiltViewModel
+class CollectionDetailsViewModel @Inject constructor(
+    private val repository: ICollectionRepository
+) : ViewModel() {
 
     private lateinit var collectionComplete: CollectionComplete
     private var mdContent: String = ""
-    private val _saved = MutableStateFlow<Boolean?>(null)
-    val saved = _saved.asStateFlow()
+    private val _saveResult = MutableStateFlow<Result<Boolean>>(Result.None)
+    val savedResult = _saveResult.asStateFlow()
 
     fun setCollectionComplete(collectionComplete: CollectionComplete) {
         this.collectionComplete = collectionComplete
@@ -34,24 +38,8 @@ class CollectionDetailsViewModel : ViewModel() {
 
     fun save() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val type = collectionComplete.collection.type
-                if (type == CollectionType.MD) {
-                    val name = File(collectionComplete.collection.content).name
-                    val newFile = saveMarkdown(name, mdContent, true)
-                    newFile?.let {
-                        collectionComplete.collection.content = newFile.path
-                    } ?: run {
-                        _saved.value = false
-                        return@launch
-                    }
-                }
-                AppDatabase.db.collectionDao().update(collectionComplete.collection)
-                _saved.value = true
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _saved.value = false
-            }
+            _saveResult.value = Result.Loading
+            _saveResult.value = repository.updateCollection(collectionComplete, mdContent)
         }
     }
 

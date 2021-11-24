@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
@@ -28,6 +27,7 @@ import com.lijie.jiancang.data.db.entity.Collection
 import com.lijie.jiancang.data.db.entity.CollectionComplete
 import com.lijie.jiancang.data.db.entity.CollectionType
 import com.lijie.jiancang.data.db.entity.LabelQuote
+import com.lijie.jiancang.data.source.PreviewCollectionRepository
 import com.lijie.jiancang.ext.toTime
 import com.lijie.jiancang.ui.compose.AutoLinkText
 import com.lijie.jiancang.ui.compose.TopAppBar
@@ -38,14 +38,14 @@ import java.io.File
 object MainScreen : Screen("main_screen")
 
 val LocalMainViewModel = staticCompositionLocalOf {
-    MainViewModel()
+    MainViewModel(PreviewCollectionRepository())
 }
 
 @ExperimentalMaterialApi
 @ExperimentalCoilApi
 @Composable
 fun MainScreen(
-    viewModel: MainViewModel = viewModel(),
+    viewModel: MainViewModel,
     onItemClick: (CollectionComplete) -> Unit
 ) {
     CompositionLocalProvider(LocalMainViewModel provides viewModel) {
@@ -58,16 +58,14 @@ fun MainScreen(
             MainDrawerContent()
         }) {
             val collections by viewModel.collections.collectAsState()
-            if (collections.isNotEmpty()) {
-                LazyColumn(modifier = Modifier.padding(8.dp)) {
-                    items(collections) {
-                        CollectionItem(it, onItemClick)
-                    }
+            LazyColumn(modifier = Modifier.padding(8.dp)) {
+                items(collections) {
+                    CollectionItem(it, onItemClick)
                 }
             }
-            LaunchedEffect(key1 = Unit, block = {
+            LaunchedEffect(Unit) {
                 viewModel.queryCollections()
-            })
+            }
         }
     }
 }
@@ -163,7 +161,7 @@ fun CollectionItem(
 @Preview
 @Composable
 fun MainPreview() {
-    MainScreen(MainViewModel().apply {
+    MainScreen(MainViewModel(PreviewCollectionRepository()).apply {
         setCollections(
             listOf(
                 CollectionComplete(

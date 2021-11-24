@@ -8,6 +8,6 @@ import com.lijie.jiancang.data.db.entity.Label
 interface LabelDao : IDao<Label> {
 
     @Query("SELECT * FROM label")
-    suspend fun queryLabels(): List<Label>?
+    suspend fun queryLabels(): List<Label>
 
 }

@@ -18,13 +18,14 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.flowlayout.FlowRow
+import com.lijie.jiancang.data.Result
 import com.lijie.jiancang.data.db.entity.CollectionType
 import com.lijie.jiancang.data.db.entity.Label
+import com.lijie.jiancang.data.source.PreviewCollectionRepository
 import com.lijie.jiancang.ext.findUrl
 import com.lijie.jiancang.ext.toast
 import com.lijie.jiancang.ui.compose.ProgressDialog
@@ -38,7 +39,7 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 object AddCollectionScreen : Screen("add_collection_screen")
 
 private val LocalAddCollectionViewModel = staticCompositionLocalOf {
-    AddCollectionViewModel()
+    AddCollectionViewModel(PreviewCollectionRepository())
 }
 
 @ExperimentalUnitApi
@@ -46,7 +47,7 @@ private val LocalAddCollectionViewModel = staticCompositionLocalOf {
 @ExperimentalCoilApi
 @Composable
 fun AddCollectionScreen(
-    viewModel: AddCollectionViewModel = viewModel(),
+    viewModel: AddCollectionViewModel,
     content: String = "内容",
     type: CollectionType = CollectionType.Text
 ) {
@@ -70,20 +71,26 @@ fun AddCollectionScreen(
                     }) {
                         Icon(Icons.Default.Done, contentDescription = "保存")
                     }
-                    val save by viewModel.saved.collectAsState()
-                    when (save) {
-                        true -> {
-                            LaunchedEffect(Unit) {
-                                "保存成功".toast()
-                                onBackPressedDispatcher?.onBackPressed()
-                            }
-                        }
-                        false -> {
-                            "保存失败".toast()
-                        }
-                    }
                 }
             )
+            val savedLoading by viewModel.savedResult.collectAsState()
+            when (savedLoading) {
+                is Result.Success -> {
+                    LaunchedEffect(savedLoading) {
+                        "保存成功".toast()
+                        onBackPressedDispatcher?.onBackPressed()
+                    }
+                }
+                is Result.Error -> {
+                    LaunchedEffect(savedLoading) {
+                        "保存失败".toast()
+                    }
+                }
+                is Result.Loading -> {
+                    ProgressDialog(onDismissRequest = { })
+                }
+                else -> {}
+            }
         }) {
             Column(
                 modifier = Modifier
@@ -257,7 +264,7 @@ fun LabelsFlow(labels: List<Label>) {
 @Preview
 @Composable
 fun AddCollectionPreview() {
-    AddCollectionScreen(AddCollectionViewModel().apply {
+    AddCollectionScreen(AddCollectionViewModel(PreviewCollectionRepository()).apply {
         setLabels(
             arrayListOf(
                 Label(name = "电影"),

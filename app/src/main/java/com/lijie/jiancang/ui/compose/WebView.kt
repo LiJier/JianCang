@@ -22,9 +22,12 @@ fun WebView(
     class InJavaScriptLocalObj {
 
         @JavascriptInterface
-        fun showSource(html: String) {
-            val newHtml = "<html>${html}</html>"
-            val jsoup = Jsoup.parse(newHtml)
+        fun htmlSource(html: String) {
+            newHtml("<html>${html}</html>")
+        }
+
+        private fun newHtml(html: String) {
+            val jsoup = Jsoup.parse(html)
             var title = jsoup.title()
             if (title.isNullOrEmpty()) {
                 val elements = jsoup.head().getElementsByTag("meta")
@@ -33,7 +36,14 @@ fun WebView(
                 }
                 title = titleEle.getOrNull(0)?.attr("content") ?: ""
             }
-            onLoadComplete?.invoke(title, newHtml)
+            onLoadComplete?.invoke(title, html)
+//            val article = jsoup.body().getElementsByTag("article")
+//            if (article.isNullOrEmpty()) {
+//                onLoadComplete?.invoke(title, html)
+//            } else {
+//                val newHtml = "<html><head><title>${title}</title></head>${article}</html>"
+//                onLoadComplete?.invoke(title, newHtml)
+//            }
         }
 
     }
@@ -49,7 +59,7 @@ fun WebView(
 
             override fun onPageFinished(view: WebView, url: String) {
                 view.loadUrl(
-                    "javascript:window.local_obj.showSource(document.getElementsByTagName('html')[0].innerHTML);"
+                    "javascript:window.local_obj.htmlSource(document.getElementsByTagName('html')[0].innerHTML);"
                 )
                 super.onPageFinished(view, url)
             }

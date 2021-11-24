@@ -11,6 +11,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.os.bundleOf
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
@@ -60,10 +61,10 @@ fun Navigation(
                     slideOutHorizontally(targetOffsetX = { 1000 })
                 }) {
                 composable(route = AddCollectionScreen.route) {
-                    AddCollectionScreen(content = collectionContent, type = collectionType)
+                    AddCollectionScreen(hiltViewModel(), collectionContent, collectionType)
                 }
                 composable(route = MainScreen.route) {
-                    MainScreen {
+                    MainScreen(hiltViewModel()) {
                         arguments.putParcelable(COLLECTION_COMPLETE_KEY, it)
                         navController.navigate(CollectionDetailScreen.route)
                     }
@@ -73,7 +74,7 @@ fun Navigation(
                         COLLECTION_COMPLETE_KEY
                     )?.let {
                         CollectionDetailScreen(
-                            collectionComplete = it
+                            hiltViewModel(), it
                         )
                     }
                 }

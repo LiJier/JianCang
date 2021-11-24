@@ -23,14 +23,15 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
+import com.lijie.jiancang.data.Result
 import com.lijie.jiancang.data.db.entity.Collection
 import com.lijie.jiancang.data.db.entity.CollectionComplete
 import com.lijie.jiancang.data.db.entity.CollectionType
 import com.lijie.jiancang.data.db.entity.LabelQuote
+import com.lijie.jiancang.data.source.PreviewCollectionRepository
 import com.lijie.jiancang.ext.toast
 import com.lijie.jiancang.ui.compose.*
 import com.lijie.jiancang.viewmodel.CollectionDetailsViewModel
@@ -40,7 +41,7 @@ import java.io.File
 object CollectionDetailScreen : Screen("collection_detail_screen")
 
 private val LocalCollectionDetailsViewModel = staticCompositionLocalOf {
-    CollectionDetailsViewModel()
+    CollectionDetailsViewModel(PreviewCollectionRepository())
 }
 
 @ExperimentalAnimatedInsets
@@ -49,7 +50,7 @@ private val LocalCollectionDetailsViewModel = staticCompositionLocalOf {
 @ExperimentalUnitApi
 @Composable
 fun CollectionDetailScreen(
-    viewModel: CollectionDetailsViewModel = viewModel(),
+    viewModel: CollectionDetailsViewModel,
     collectionComplete: CollectionComplete
 ) {
     CompositionLocalProvider(
@@ -81,23 +82,28 @@ fun CollectionDetailScreen(
                                 viewModel.save()
                             }) {
                                 Icon(Icons.Default.Done, contentDescription = "保存")
-                                val save by viewModel.saved.collectAsState()
-                                when (save) {
-                                    true -> {
-                                        LaunchedEffect(Unit) {
-                                            "保存成功".toast()
-                                            onBackPressedDispatcher?.onBackPressed()
-                                        }
-                                    }
-                                    false -> {
-                                        "保存失败".toast()
-                                    }
-                                    else -> {}
-                                }
                             }
                         }
                     }
                 })
+            val savedResult by viewModel.savedResult.collectAsState()
+            when (savedResult) {
+                is Result.Success -> {
+                    LaunchedEffect(savedResult) {
+                        "保存成功".toast()
+                        onBackPressedDispatcher?.onBackPressed()
+                    }
+                }
+                is Result.Error -> {
+                    LaunchedEffect(savedResult) {
+                        "保存失败".toast()
+                    }
+                }
+                is Result.Loading -> {
+                    ProgressDialog(onDismissRequest = { })
+                }
+                else -> {}
+            }
         }, modifier = Modifier.fillMaxSize()) {
             var height by remember { mutableStateOf(0) }
             Column(
@@ -204,7 +210,7 @@ private fun URLContent(collectionComplete: CollectionComplete) {
 @Composable
 fun CollectionDetailPreview() {
     CollectionDetailScreen(
-        CollectionDetailsViewModel(),
+        CollectionDetailsViewModel(PreviewCollectionRepository()),
         CollectionComplete(
             Collection(
                 type = CollectionType.Text,
