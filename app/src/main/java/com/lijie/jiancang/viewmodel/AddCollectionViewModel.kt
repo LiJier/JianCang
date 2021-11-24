@@ -7,6 +7,7 @@ import com.lijie.jiancang.data.db.entity.Collection
 import com.lijie.jiancang.data.db.entity.CollectionType
 import com.lijie.jiancang.data.db.entity.Label
 import com.lijie.jiancang.data.source.ICollectionRepository
+import com.lijie.jiancang.data.source.PreviewCollectionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +29,17 @@ class AddCollectionViewModel @Inject constructor(
     )
 
     private val _labelsResult = MutableStateFlow<Result<List<Label>>>(Result.None)
-    private val _labels = MutableStateFlow<List<Label>>(listOf())
+    private val _labels = MutableStateFlow<List<Label>>(
+        if (repository is PreviewCollectionRepository) {
+            listOf(
+                Label(name = "电影"),
+                Label(name = "图书"),
+                Label(name = "歌曲")
+            )
+        } else {
+            listOf()
+        }
+    )
     val labelsLoading = _labelsResult.asStateFlow()
     val labels = _labels.asStateFlow()
 
@@ -53,10 +64,6 @@ class AddCollectionViewModel @Inject constructor(
 
     fun setIdea(idea: String) {
         collection.idea = idea
-    }
-
-    fun setLabels(labels: List<Label>) {
-        _labels.value = labels
     }
 
     fun queryLabel() {

@@ -152,7 +152,7 @@ class PreviewCollectionRepository : ICollectionRepository {
     }
 
     override suspend fun getAllLabels(): Result<List<Label>> {
-        return Result.Success(arrayListOf())
+        return Result.Success(listOf())
     }
 
     override suspend fun saveCollection(

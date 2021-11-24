@@ -23,10 +23,8 @@ import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.flowlayout.FlowRow
 import com.lijie.jiancang.R
-import com.lijie.jiancang.data.db.entity.Collection
 import com.lijie.jiancang.data.db.entity.CollectionComplete
 import com.lijie.jiancang.data.db.entity.CollectionType
-import com.lijie.jiancang.data.db.entity.LabelQuote
 import com.lijie.jiancang.data.source.PreviewCollectionRepository
 import com.lijie.jiancang.ext.toTime
 import com.lijie.jiancang.ui.compose.AutoLinkText
@@ -161,32 +159,7 @@ fun CollectionItem(
 @Preview
 @Composable
 fun MainPreview() {
-    MainScreen(MainViewModel(PreviewCollectionRepository()).apply {
-        setCollections(
-            listOf(
-                CollectionComplete(
-                    Collection(
-                        type = CollectionType.URL,
-                        original = "",
-                        title = "百度",
-                        content = "https://www.baidu.com/",
-                        createTime = System.currentTimeMillis()
-                    ),
-                    arrayListOf(LabelQuote(labelName = "电影"))
-                ),
-                CollectionComplete(
-                    Collection(
-                        type = CollectionType.Text,
-                        original = "",
-                        title = "标题",
-                        content = "预览",
-                        createTime = System.currentTimeMillis()
-                    ),
-                    arrayListOf(LabelQuote(labelName = "歌曲"))
-                )
-            )
-        )
-    }) {}
+    MainScreen(MainViewModel(PreviewCollectionRepository())) {}
 }
 
 

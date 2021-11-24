@@ -28,8 +28,8 @@ android {
     }
     signingConfigs {
         config {
-            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
-//            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
+//            storeFile file('D:\\OneDrive\\个人文件\\lj.jks')
+            storeFile file('/Users/lijie/OneDrive/个人文件/lj.jks')
             storePassword 'lj37927'
             keyAlias 'lj'
             keyPassword 'lj37927'
@@ -90,10 +90,10 @@ dependencies {
     implementation 'com.github.jeziellago:compose-markdown:0.2.6'
     implementation 'com.github.javakam:file.core:2.3.0@aar'
     implementation 'com.guolindev.permissionx:permissionx:1.6.1'
-    implementation "com.google.dagger:hilt-android:2.35"
+    implementation 'com.google.dagger:hilt-android:2.35'
     implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03'
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-beta01'
-    kapt "com.google.dagger:hilt-android-compiler:2.35"
+    kapt 'com.google.dagger:hilt-android-compiler:2.35'
     kapt 'androidx.hilt:hilt-compiler:1.0.0'
     kapt "androidx.room:room-compiler:$room_version"
     testImplementation 'junit:junit:4.13.2'

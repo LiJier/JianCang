@@ -264,14 +264,6 @@ fun LabelsFlow(labels: List<Label>) {
 @Preview
 @Composable
 fun AddCollectionPreview() {
-    AddCollectionScreen(AddCollectionViewModel(PreviewCollectionRepository()).apply {
-        setLabels(
-            arrayListOf(
-                Label(name = "电影"),
-                Label(name = "图书"),
-                Label(name = "歌曲")
-            )
-        )
-    })
+    AddCollectionScreen(AddCollectionViewModel(PreviewCollectionRepository()))
 }
 
