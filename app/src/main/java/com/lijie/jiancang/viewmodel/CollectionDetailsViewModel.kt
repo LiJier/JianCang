@@ -20,7 +20,7 @@ class CollectionDetailsViewModel @Inject constructor(
 
     private lateinit var collectionComplete: CollectionComplete
     private var mdContent: String = ""
-    private val _saveResult = MutableStateFlow<Result<Boolean>>(Result.None)
+    private val _saveResult = MutableStateFlow<Result<Boolean>>(Result.Success(false))
     val savedResult = _saveResult.asStateFlow()
 
     fun setCollectionComplete(collectionComplete: CollectionComplete) {

@@ -1,6 +1,7 @@
 package com.lijie.jiancang.ext
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -9,7 +10,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.util.rangeTo
 import com.lijie.jiancang.App
-import java.util.regex.Pattern
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 
 var toast: Toast? = null
 
@@ -87,14 +90,126 @@ fun String.findUrl(): String? {
     return urlList.lastOrNull()
 }
 
-fun String.filterHtml(): String {
-    var str = this
-    val regEx = "(?!<(img |a ).*?>)<.*?>"
-    val pHtml = Pattern.compile(regEx, Pattern.CASE_INSENSITIVE)
-    val mHtml = pHtml.matcher(str)
-    str = mHtml.replaceAll("")
-    val pN = Pattern.compile("(\r?\n(\\s*\r?\n)+)")
-    val pM = pN.matcher(str)
-    str = pM.replaceAll("\r\n")
-    return str.trim()
+fun String.article(): Pair<String, String> {
+    val doc = Jsoup.parse("<html>${this}</html>")
+    val title = findTitle(doc)
+    val article = findArticle(doc)
+    return Pair(title, article)
+}
+
+private fun findTitle(doc: Document): String {
+    var title = doc.title() ?: ""
+    if (title.isEmpty()) {
+        val elements = doc.head().getElementsByTag("meta")
+        val titleEle = elements.filter {
+            it.attr("property").contains("title")
+        }
+        title = titleEle.getOrNull(0)?.attr("content") ?: ""
+    }
+    val hText = arrayListOf<String>()
+    doc.allElements.forEach {
+        val tagName = it.tagName()
+        if (tagName == "h1" || tagName == "h2" || tagName == "h3" || tagName == "h4" || tagName == "h5") {
+            if (it.childrenSize() == 0 && it.hasText()) {
+                hText.add(it.text())
+            }
+        }
+    }
+    hText.forEach {
+        if (title.isEmpty()) {
+            title = it
+        } else {
+            if (it.contains(title)) {
+                title = it
+            }
+        }
+    }
+    return title
+}
+
+private fun findArticle(doc: Document): String {
+    doc.getElementsByTag("script").remove()
+    var targetElement = doc.getElementsByTag("article")
+    if (targetElement.size == 0) {
+        targetElement = doc.body().allElements
+    }
+    val sb = StringBuilder()
+    var lastElement = Element("a")
+    targetElement.forEach { element ->
+        val elms = element.allElements
+        if (elms.size <= 1) {
+            val textNodes = elms.textNodes()
+            if (textNodes.size > 0) {
+                if (lastElement.allElements.contains(element).not()) {
+                    if (element.hasText() || element.getElementsByTag("img").size > 0) {
+                        if (visible(element)) {
+                            sb.append(element.toString()).append("\n")
+                            Log.d("article", element.toString())
+                        }
+                    }
+                    lastElement = element
+                }
+            } else {
+                if (elms.isEmpty()) {
+                    if (lastElement.allElements.contains(element).not()) {
+                        if (element.hasText() || element.getElementsByTag("img").size > 0) {
+                            if (visible(element)) {
+                                sb.append(element.toString()).append("\n")
+                                Log.d("article", element.toString())
+                            }
+                        }
+                        lastElement = element
+                    }
+                }
+            }
+        }
+    }
+    return sb.toString()
+}
+
+private fun visible(element: Element): Boolean {
+    val text = element.text()
+    val attr = StringBuilder()
+    attr.append(element.attributes().toString())
+    element.children().forEach {
+        attr.append(it.tagName())
+        attr.append(it.attributes().toString())
+        attr.append(it.classNames().toString())
+    }
+    return (text.length > 10 ||
+            (text.contains("！") ||
+                    text.contains("，") ||
+                    text.contains("。") ||
+                    text.contains("？") ||
+                    text.contains("、") ||
+                    text.contains("；") ||
+                    text.contains("：") ||
+                    text.contains("“") ||
+                    text.contains("”") ||
+                    text.contains("‘") ||
+                    text.contains("’") ||
+                    text.contains("《") ||
+                    text.contains("》") ||
+                    text.contains("%") ||
+                    text.contains("（") ||
+                    text.contains("）") ||
+                    text.contains(",") ||
+                    text.contains(".") ||
+                    text.contains("?") ||
+                    text.contains(":") ||
+                    text.contains(";") ||
+                    text.contains("'") ||
+                    text.contains("\"") ||
+                    text.contains("!") ||
+                    text.contains("%") ||
+                    text.contains("(") ||
+                    text.contains(")"))
+            ) && ((attr.contains("hidden") ||
+            attr.contains("hide") ||
+            attr.contains("button") ||
+            attr.contains("dialog") ||
+            attr.contains("javascript") ||
+            attr.contains("toast") ||
+            attr.contains("btn") ||
+            attr.contains("profile")).not())
 }

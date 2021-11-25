@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.viewinterop.AndroidView
-import org.jsoup.Jsoup
+import com.lijie.jiancang.ext.article
 
 @ExperimentalUnitApi
 @SuppressLint("SetJavaScriptEnabled")
@@ -23,27 +23,8 @@ fun WebView(
 
         @JavascriptInterface
         fun htmlSource(html: String) {
-            newHtml("<html>${html}</html>")
-        }
-
-        private fun newHtml(html: String) {
-            val jsoup = Jsoup.parse(html)
-            var title = jsoup.title()
-            if (title.isNullOrEmpty()) {
-                val elements = jsoup.head().getElementsByTag("meta")
-                val titleEle = elements.filter {
-                    it.attr("property").contains("title")
-                }
-                title = titleEle.getOrNull(0)?.attr("content") ?: ""
-            }
-            onLoadComplete?.invoke(title, html)
-//            val article = jsoup.body().getElementsByTag("article")
-//            if (article.isNullOrEmpty()) {
-//                onLoadComplete?.invoke(title, html)
-//            } else {
-//                val newHtml = "<html><head><title>${title}</title></head>${article}</html>"
-//                onLoadComplete?.invoke(title, newHtml)
-//            }
+            val (title, newHtml) = html.article()
+            onLoadComplete?.invoke(title, newHtml)
         }
 
     }

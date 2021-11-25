@@ -41,7 +41,7 @@ import java.io.File
 object CollectionDetailScreen : Screen("collection_detail_screen")
 
 private val LocalCollectionDetailsViewModel = staticCompositionLocalOf {
-    CollectionDetailsViewModel(PreviewCollectionRepository())
+    CollectionDetailsViewModel(PreviewCollectionRepository)
 }
 
 @ExperimentalAnimatedInsets
@@ -90,8 +90,10 @@ fun CollectionDetailScreen(
             when (savedResult) {
                 is Result.Success -> {
                     LaunchedEffect(savedResult) {
-                        "保存成功".toast()
-                        onBackPressedDispatcher?.onBackPressed()
+                        if ((savedResult as Result.Success<Boolean>).data) {
+                            "保存成功".toast()
+                            onBackPressedDispatcher?.onBackPressed()
+                        }
                     }
                 }
                 is Result.Error -> {
@@ -102,7 +104,6 @@ fun CollectionDetailScreen(
                 is Result.Loading -> {
                     ProgressDialog(onDismissRequest = { })
                 }
-                else -> {}
             }
         }, modifier = Modifier.fillMaxSize()) {
             var height by remember { mutableStateOf(0) }
@@ -210,7 +211,7 @@ private fun URLContent(collectionComplete: CollectionComplete) {
 @Composable
 fun CollectionDetailPreview() {
     CollectionDetailScreen(
-        CollectionDetailsViewModel(PreviewCollectionRepository()),
+        CollectionDetailsViewModel(PreviewCollectionRepository),
         CollectionComplete(
             Collection(
                 type = CollectionType.Text,

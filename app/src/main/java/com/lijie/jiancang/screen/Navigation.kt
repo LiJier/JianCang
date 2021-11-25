@@ -64,9 +64,11 @@ fun Navigation(
                     AddCollectionScreen(hiltViewModel(), collectionContent, collectionType)
                 }
                 composable(route = MainScreen.route) {
-                    MainScreen(hiltViewModel()) {
+                    MainScreen(hiltViewModel(), {
                         arguments.putParcelable(COLLECTION_COMPLETE_KEY, it)
                         navController.navigate(CollectionDetailScreen.route)
+                    }) {
+                        navController.navigate(it)
                     }
                 }
                 composable(route = CollectionDetailScreen.route) {
@@ -77,6 +79,9 @@ fun Navigation(
                             hiltViewModel(), it
                         )
                     }
+                }
+                composable(route = LabelManagerScreen.route) {
+                    LabelManagerScreen(hiltViewModel())
                 }
             }
         }

@@ -25,6 +25,10 @@ interface ICollectionRepository {
         mdContent: String
     ): Result<Boolean>
 
+    suspend fun addLabel(labelName: String): Result<Boolean>
+
+    suspend fun deleteLabel(label: Label): Result<Boolean>
+
 }
 
 class CollectionRepository(
@@ -143,16 +147,67 @@ class CollectionRepository(
         }
     }
 
+    override suspend fun addLabel(labelName: String): Result<Boolean> {
+        return try {
+            val labelDao = db.labelDao()
+            labelDao.insert(Label(name = labelName))
+            Result.Success(true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    override suspend fun deleteLabel(label: Label): Result<Boolean> {
+        return try {
+            db.labelQuoteDao().deleteLabel(label.id)
+            db.labelDao().delete(label)
+            Result.Success(true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
 }
 
-class PreviewCollectionRepository : ICollectionRepository {
+object PreviewCollectionRepository : ICollectionRepository {
 
     override suspend fun getAllCollection(): Result<List<CollectionComplete>> {
-        return Result.Success(listOf())
+        return Result.Success(
+            listOf(
+                CollectionComplete(
+                    Collection(
+                        type = CollectionType.URL,
+                        original = "",
+                        title = "百度",
+                        content = "https://www.baidu.com/",
+                        createTime = System.currentTimeMillis()
+                    ),
+                    arrayListOf(LabelQuote(labelName = "电影"))
+                ),
+                CollectionComplete(
+                    Collection(
+                        type = CollectionType.Text,
+                        original = "",
+                        title = "标题",
+                        content = "预览",
+                        createTime = System.currentTimeMillis()
+                    ),
+                    arrayListOf(LabelQuote(labelName = "歌曲"))
+                )
+            )
+        )
     }
 
     override suspend fun getAllLabels(): Result<List<Label>> {
-        return Result.Success(listOf())
+        return Result.Success(
+            listOf(
+                Label(name = "电影"),
+                Label(name = "图书"),
+                Label(name = "歌曲")
+            )
+        )
     }
 
     override suspend fun saveCollection(
@@ -170,6 +225,14 @@ class PreviewCollectionRepository : ICollectionRepository {
         collectionComplete: CollectionComplete,
         mdContent: String
     ): Result<Boolean> {
+        return Result.Success(true)
+    }
+
+    override suspend fun addLabel(labelName: String): Result<Boolean> {
+        return Result.Success(true)
+    }
+
+    override suspend fun deleteLabel(label: Label): Result<Boolean> {
         return Result.Success(true)
     }
 

@@ -22,7 +22,7 @@ import com.lijie.jiancang.ui.theme.Purple200
 
 @ExperimentalMaterialApi
 @Composable
-fun MainDrawerContent() {
+fun MainDrawerContent(onDrawerItemClick: (String) -> Unit) {
     Column {
         Image(
             painter = ColorPainter(Purple200),
@@ -35,7 +35,7 @@ fun MainDrawerContent() {
             icon = { Icon(Icons.Default.Info, "", tint = Purple200) },
             modifier = Modifier
                 .clickable {
-
+                    onDrawerItemClick(LabelManagerScreen.route)
                 })
         ListItem(text = { Text(text = "偏好设置") },
             icon = { Icon(Icons.Default.Favorite, "", tint = Purple200) },
@@ -56,5 +56,5 @@ fun MainDrawerContent() {
 @Preview
 @Composable
 fun MainDrawerPreview() {
-    MainDrawerContent()
+    MainDrawerContent {}
 }

@@ -39,7 +39,7 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 object AddCollectionScreen : Screen("add_collection_screen")
 
 private val LocalAddCollectionViewModel = staticCompositionLocalOf {
-    AddCollectionViewModel(PreviewCollectionRepository())
+    AddCollectionViewModel(PreviewCollectionRepository)
 }
 
 @ExperimentalUnitApi
@@ -73,23 +73,24 @@ fun AddCollectionScreen(
                     }
                 }
             )
-            val savedLoading by viewModel.savedResult.collectAsState()
-            when (savedLoading) {
+            val savedResult by viewModel.savedResult.collectAsState()
+            when (savedResult) {
                 is Result.Success -> {
-                    LaunchedEffect(savedLoading) {
-                        "保存成功".toast()
-                        onBackPressedDispatcher?.onBackPressed()
+                    LaunchedEffect(savedResult) {
+                        if ((savedResult as Result.Success<Boolean>).data){
+                            "保存成功".toast()
+                            onBackPressedDispatcher?.onBackPressed()
+                        }
                     }
                 }
                 is Result.Error -> {
-                    LaunchedEffect(savedLoading) {
+                    LaunchedEffect(savedResult) {
                         "保存失败".toast()
                     }
                 }
                 is Result.Loading -> {
                     ProgressDialog(onDismissRequest = { })
                 }
-                else -> {}
             }
         }) {
             Column(
@@ -152,6 +153,30 @@ fun AddCollectionScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun LabelsFlow(labels: List<Label>) {
+    val theme by LocalViewModel.current.theme.collectAsState()
+    FlowRow(mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
+        labels.forEach { label ->
+            var check by remember { mutableStateOf(label.check) }
+            Text(
+                text = label.name,
+                color = Color.White,
+                modifier = Modifier
+                    .background(
+                        if (check) theme.primaryVariant else theme.primary,
+                        shape = Shapes.small
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .clickable {
+                        check = check.not()
+                        label.check = check
+                    }
+            )
         }
     }
 }
@@ -235,35 +260,11 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
     }
 }
 
-@Composable
-fun LabelsFlow(labels: List<Label>) {
-    val theme by LocalViewModel.current.theme.collectAsState()
-    FlowRow(mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
-        labels.forEach { label ->
-            var check by remember { mutableStateOf(label.check) }
-            Text(
-                text = label.name,
-                color = Color.White,
-                modifier = Modifier
-                    .background(
-                        if (check) theme.primaryVariant else theme.primary,
-                        shape = Shapes.small
-                    )
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .clickable {
-                        check = check.not()
-                        label.check = check
-                    }
-            )
-        }
-    }
-}
-
 @ExperimentalUnitApi
 @ExperimentalCoilApi
 @Preview
 @Composable
 fun AddCollectionPreview() {
-    AddCollectionScreen(AddCollectionViewModel(PreviewCollectionRepository()))
+    AddCollectionScreen(AddCollectionViewModel(PreviewCollectionRepository))
 }
 

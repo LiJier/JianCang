@@ -6,9 +6,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,8 +33,8 @@ import java.io.File
 
 object MainScreen : Screen("main_screen")
 
-val LocalMainViewModel = staticCompositionLocalOf {
-    MainViewModel(PreviewCollectionRepository())
+private val LocalMainViewModel = staticCompositionLocalOf {
+    MainViewModel(PreviewCollectionRepository)
 }
 
 @ExperimentalMaterialApi
@@ -44,17 +42,30 @@ val LocalMainViewModel = staticCompositionLocalOf {
 @Composable
 fun MainScreen(
     viewModel: MainViewModel,
-    onItemClick: (CollectionComplete) -> Unit
+    onItemClick: (CollectionComplete) -> Unit,
+    onDrawerItemClick: (String) -> Unit
 ) {
     CompositionLocalProvider(LocalMainViewModel provides viewModel) {
         val context = LocalContext.current
+        var drawerStateValue by remember { mutableStateOf(DrawerValue.Closed) }
+        val drawerState = rememberDrawerState(initialValue = drawerStateValue)
+        LaunchedEffect(drawerStateValue) {
+            if (drawerStateValue == DrawerValue.Closed) {
+                drawerState.close()
+            } else {
+                drawerState.open()
+            }
+        }
         Screen(topBar = {
             TopAppBar(
                 title = { Text(text = context.getString(R.string.app_name)) }
             )
         }, drawerContent = {
-            MainDrawerContent()
-        }) {
+            MainDrawerContent {
+                drawerStateValue = DrawerValue.Closed
+                onDrawerItemClick(it)
+            }
+        }, scaffoldState = rememberScaffoldState(drawerState)) {
             val collections by viewModel.collections.collectAsState()
             LazyColumn(modifier = Modifier.padding(8.dp)) {
                 items(collections) {
@@ -159,7 +170,7 @@ fun CollectionItem(
 @Preview
 @Composable
 fun MainPreview() {
-    MainScreen(MainViewModel(PreviewCollectionRepository())) {}
+    MainScreen(MainViewModel(PreviewCollectionRepository), {}) {}
 }
 
 
