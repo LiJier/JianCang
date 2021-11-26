@@ -77,7 +77,7 @@ fun AddCollectionScreen(
             when (savedResult) {
                 is Result.Success -> {
                     LaunchedEffect(savedResult) {
-                        if ((savedResult as Result.Success<Boolean>).data){
+                        if ((savedResult as Result.Success<Boolean>).data) {
                             "保存成功".toast()
                             onBackPressedDispatcher?.onBackPressed()
                         }
@@ -197,6 +197,7 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
     }
     var editContent by remember { mutableStateOf(if (type == CollectionType.Text) content else url) }
     var htmlContent by remember { mutableStateOf("") }
+    var webLoadUrl by remember { mutableStateOf(url) }
     viewModel.setType(type)
     viewModel.setContent(editContent)
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -206,7 +207,7 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
                 if (showProgress) {
                     ProgressDialog(onDismissRequest = { showProgress = false })
                 }
-                WebView(url = url, onLoadComplete = { title, html ->
+                WebView(url = webLoadUrl, onLoadComplete = { title, html ->
                     onLoadComplete(title, html)
                     htmlContent = html
                     showProgress = false
@@ -249,6 +250,8 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
             Spacer(modifier = Modifier.width(16.dp))
             Checkbox(checked = type == CollectionType.MD, onCheckedChange = {
                 if (it) {
+                    webLoadUrl =
+                        "javascript:window.local_obj.htmlSource(document.getElementsByTagName('html')[0].innerHTML);"
                     type = CollectionType.MD
                     editContent = Remark().convert(htmlContent)
                     viewModel.setType(type)

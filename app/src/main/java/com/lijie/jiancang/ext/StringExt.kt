@@ -1,7 +1,6 @@
 package com.lijie.jiancang.ext
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -12,7 +11,6 @@ import androidx.core.util.rangeTo
 import com.lijie.jiancang.App
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 
 var toast: Toast? = null
 
@@ -92,6 +90,7 @@ fun String.findUrl(): String? {
 
 fun String.article(): Pair<String, String> {
     val doc = Jsoup.parse("<html>${this}</html>")
+    doc.getElementsByTag("script").remove()
     val title = findTitle(doc)
     val article = findArticle(doc)
     return Pair(title, article)
@@ -128,88 +127,5 @@ private fun findTitle(doc: Document): String {
 }
 
 private fun findArticle(doc: Document): String {
-    doc.getElementsByTag("script").remove()
-    var targetElement = doc.getElementsByTag("article")
-    if (targetElement.size == 0) {
-        targetElement = doc.body().allElements
-    }
-    val sb = StringBuilder()
-    var lastElement = Element("a")
-    targetElement.forEach { element ->
-        val elms = element.allElements
-        if (elms.size <= 1) {
-            val textNodes = elms.textNodes()
-            if (textNodes.size > 0) {
-                if (lastElement.allElements.contains(element).not()) {
-                    if (element.hasText() || element.getElementsByTag("img").size > 0) {
-                        if (visible(element)) {
-                            sb.append(element.toString()).append("\n")
-                            Log.d("article", element.toString())
-                        }
-                    }
-                    lastElement = element
-                }
-            } else {
-                if (elms.isEmpty()) {
-                    if (lastElement.allElements.contains(element).not()) {
-                        if (element.hasText() || element.getElementsByTag("img").size > 0) {
-                            if (visible(element)) {
-                                sb.append(element.toString()).append("\n")
-                                Log.d("article", element.toString())
-                            }
-                        }
-                        lastElement = element
-                    }
-                }
-            }
-        }
-    }
-    return sb.toString()
-}
-
-private fun visible(element: Element): Boolean {
-    val text = element.text()
-    val attr = StringBuilder()
-    attr.append(element.attributes().toString())
-    element.children().forEach {
-        attr.append(it.tagName())
-        attr.append(it.attributes().toString())
-        attr.append(it.classNames().toString())
-    }
-    return (text.length > 10 ||
-            (text.contains("！") ||
-                    text.contains("，") ||
-                    text.contains("。") ||
-                    text.contains("？") ||
-                    text.contains("、") ||
-                    text.contains("；") ||
-                    text.contains("：") ||
-                    text.contains("“") ||
-                    text.contains("”") ||
-                    text.contains("‘") ||
-                    text.contains("’") ||
-                    text.contains("《") ||
-                    text.contains("》") ||
-                    text.contains("%") ||
-                    text.contains("（") ||
-                    text.contains("）") ||
-                    text.contains(",") ||
-                    text.contains(".") ||
-                    text.contains("?") ||
-                    text.contains(":") ||
-                    text.contains(";") ||
-                    text.contains("'") ||
-                    text.contains("\"") ||
-                    text.contains("!") ||
-                    text.contains("%") ||
-                    text.contains("(") ||
-                    text.contains(")"))
-            ) && ((attr.contains("hidden") ||
-            attr.contains("hide") ||
-            attr.contains("button") ||
-            attr.contains("dialog") ||
-            attr.contains("javascript") ||
-            attr.contains("toast") ||
-            attr.contains("btn") ||
-            attr.contains("profile")).not())
+    return doc.getContentEle().toString()
 }

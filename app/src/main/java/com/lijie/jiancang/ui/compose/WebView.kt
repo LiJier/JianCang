@@ -48,6 +48,8 @@ fun WebView(
         }
         webView.loadUrl(url)
         webView
-    }, modifier)
+    }, modifier, update = {
+        it.loadUrl(url)
+    })
 
 }
