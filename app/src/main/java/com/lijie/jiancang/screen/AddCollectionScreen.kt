@@ -196,22 +196,28 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
         )
     }
     var editContent by remember { mutableStateOf(if (type == CollectionType.Text) content else url) }
-    var htmlContent by remember { mutableStateOf("") }
-    var webLoadUrl by remember { mutableStateOf(url) }
+    var loadUrl by remember { mutableStateOf("") }
     viewModel.setType(type)
     viewModel.setContent(editContent)
     Column(modifier = Modifier.fillMaxWidth()) {
         Box {
-            if (type != CollectionType.Text) {
+            if (url.isNotEmpty()) {
                 var showProgress by remember { mutableStateOf(true) }
                 if (showProgress) {
                     ProgressDialog(onDismissRequest = { showProgress = false })
                 }
-                WebView(url = webLoadUrl, onLoadComplete = { title, html ->
-                    onLoadComplete(title, html)
-                    htmlContent = html
-                    showProgress = false
-                }, modifier = Modifier.size(1.dp))
+                WebView(
+                    url = url,
+                    loadUrl = loadUrl,
+                    onLoadComplete = { title, html ->
+                        onLoadComplete(title, html)
+                        showProgress = false
+                        if (type == CollectionType.MD) {
+                            editContent = Remark().convert(html)
+                        }
+                    },
+                    modifier = Modifier.size(1.dp)
+                )
             }
             if (type == CollectionType.MD) {
                 MarkdownText(markdown = editContent)
@@ -244,18 +250,17 @@ fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
                     editContent = url
                     viewModel.setType(type)
                     viewModel.setContent(editContent)
+                    loadUrl = ""
                 }
             })
             Text(text = "链接")
             Spacer(modifier = Modifier.width(16.dp))
             Checkbox(checked = type == CollectionType.MD, onCheckedChange = {
                 if (it) {
-                    webLoadUrl =
-                        "javascript:window.local_obj.htmlSource(document.getElementsByTagName('html')[0].innerHTML);"
                     type = CollectionType.MD
-                    editContent = Remark().convert(htmlContent)
                     viewModel.setType(type)
-                    viewModel.setContent(editContent)
+                    loadUrl =
+                        "javascript:window.local_obj.htmlSource(document.getElementsByTagName('html')[0].innerHTML);"
                 }
             })
             Text(text = "离线MD")

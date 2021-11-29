@@ -127,5 +127,9 @@ private fun findTitle(doc: Document): String {
 }
 
 private fun findArticle(doc: Document): String {
-    return doc.getContentEle().toString()
+    return if (doc.body().getElementsByTag("article").size == 1) {
+        doc.body().getElementsByTag("article").toString()
+    } else {
+        doc.getContentEle().toString()
+    }
 }

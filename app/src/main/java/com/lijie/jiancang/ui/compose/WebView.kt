@@ -16,6 +16,7 @@ import com.lijie.jiancang.ext.article
 fun WebView(
     url: String,
     modifier: Modifier = Modifier,
+    loadUrl: String = "",
     onLoadComplete: ((String, String) -> Unit)? = null
 ) {
 
@@ -28,6 +29,7 @@ fun WebView(
         }
 
     }
+
     AndroidView(factory = {
         val webView = WebView(it)
         webView.settings.javaScriptEnabled = true
@@ -49,7 +51,9 @@ fun WebView(
         webView.loadUrl(url)
         webView
     }, modifier, update = {
-        it.loadUrl(url)
+        if (loadUrl.isNotEmpty()) {
+            it.loadUrl(loadUrl)
+        }
     })
 
 }
