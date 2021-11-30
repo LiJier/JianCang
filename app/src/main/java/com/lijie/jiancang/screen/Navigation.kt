@@ -21,7 +21,6 @@ import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.lijie.jiancang.data.db.entity.CollectionComplete
 import com.lijie.jiancang.data.db.entity.CollectionType
-import com.lijie.jiancang.ui.theme.JianCangTheme
 import com.lijie.jiancang.viewmodel.LocalViewModel
 
 
@@ -45,44 +44,42 @@ fun Navigation(
     collectionType: CollectionType = CollectionType.Text,
 ) {
     CompositionLocalProvider(LocalViewModel provides localViewModel) {
-        JianCangTheme {
-            val arguments = bundleOf()
-            AnimatedNavHost(navController = navController, startDestination = startDestination,
-                enterTransition = {
-                    slideInHorizontally(initialOffsetX = { 1000 })
-                },
-                exitTransition = {
-                    slideOutHorizontally(targetOffsetX = { -1000 })
-                },
-                popEnterTransition = {
-                    slideInHorizontally(initialOffsetX = { -1000 })
-                },
-                popExitTransition = {
-                    slideOutHorizontally(targetOffsetX = { 1000 })
+        val arguments = bundleOf()
+        AnimatedNavHost(navController = navController, startDestination = startDestination,
+            enterTransition = {
+                slideInHorizontally(initialOffsetX = { 1000 })
+            },
+            exitTransition = {
+                slideOutHorizontally(targetOffsetX = { -1000 })
+            },
+            popEnterTransition = {
+                slideInHorizontally(initialOffsetX = { -1000 })
+            },
+            popExitTransition = {
+                slideOutHorizontally(targetOffsetX = { 1000 })
+            }) {
+            composable(route = AddCollectionScreen.route) {
+                AddCollectionScreen(hiltViewModel(), collectionContent, collectionType)
+            }
+            composable(route = MainScreen.route) {
+                MainScreen(hiltViewModel(), {
+                    arguments.putParcelable(COLLECTION_COMPLETE_KEY, it)
+                    navController.navigate(CollectionDetailScreen.route)
                 }) {
-                composable(route = AddCollectionScreen.route) {
-                    AddCollectionScreen(hiltViewModel(), collectionContent, collectionType)
+                    navController.navigate(it)
                 }
-                composable(route = MainScreen.route) {
-                    MainScreen(hiltViewModel(), {
-                        arguments.putParcelable(COLLECTION_COMPLETE_KEY, it)
-                        navController.navigate(CollectionDetailScreen.route)
-                    }) {
-                        navController.navigate(it)
-                    }
+            }
+            composable(route = CollectionDetailScreen.route) {
+                arguments.getParcelable<CollectionComplete>(
+                    COLLECTION_COMPLETE_KEY
+                )?.let {
+                    CollectionDetailScreen(
+                        hiltViewModel(), it
+                    )
                 }
-                composable(route = CollectionDetailScreen.route) {
-                    arguments.getParcelable<CollectionComplete>(
-                        COLLECTION_COMPLETE_KEY
-                    )?.let {
-                        CollectionDetailScreen(
-                            hiltViewModel(), it
-                        )
-                    }
-                }
-                composable(route = LabelManagerScreen.route) {
-                    LabelManagerScreen(hiltViewModel())
-                }
+            }
+            composable(route = LabelManagerScreen.route) {
+                LabelManagerScreen(hiltViewModel())
             }
         }
     }

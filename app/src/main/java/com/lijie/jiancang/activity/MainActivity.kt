@@ -18,6 +18,7 @@ import com.lijie.jiancang.data.db.entity.CollectionType
 import com.lijie.jiancang.screen.AddCollectionScreen
 import com.lijie.jiancang.screen.MainScreen
 import com.lijie.jiancang.screen.Navigation
+import com.lijie.jiancang.ui.theme.JianCangTheme
 import com.permissionx.guolindev.PermissionX
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -77,15 +78,19 @@ class MainActivity : AppCompatActivity() {
                 if (allGranted) {
                     if (content.isEmpty()) {
                         setContent {
-                            Navigation(startDestination = MainScreen.route)
+                            JianCangTheme {
+                                Navigation(startDestination = MainScreen.route)
+                            }
                         }
                     } else {
                         setContent {
-                            Navigation(
-                                startDestination = AddCollectionScreen.route,
-                                collectionContent = content,
-                                collectionType = type
-                            )
+                            JianCangTheme {
+                                Navigation(
+                                    startDestination = AddCollectionScreen.route,
+                                    collectionContent = content,
+                                    collectionType = type
+                                )
+                            }
                         }
                     }
                 }
