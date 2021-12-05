@@ -26,13 +26,13 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
-import com.lijie.jiancang.data.Result
-import com.lijie.jiancang.data.db.entity.Collection
-import com.lijie.jiancang.data.db.entity.CollectionComplete
-import com.lijie.jiancang.data.db.entity.CollectionType
-import com.lijie.jiancang.data.db.entity.LabelQuote
-import com.lijie.jiancang.data.source.PreviewCollectionRepository
+import com.lijie.jiancang.db.entity.Collection
+import com.lijie.jiancang.db.entity.CollectionComplete
+import com.lijie.jiancang.db.entity.CollectionType
+import com.lijie.jiancang.db.entity.LabelQuote
 import com.lijie.jiancang.ext.toast
+import com.lijie.jiancang.repository.PreviewRepository
+import com.lijie.jiancang.repository.Result
 import com.lijie.jiancang.ui.compose.*
 import com.lijie.jiancang.viewmodel.CollectionDetailsViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
@@ -41,7 +41,7 @@ import java.io.File
 object CollectionDetailScreen : Screen("collection_detail_screen")
 
 private val LocalCollectionDetailsViewModel = staticCompositionLocalOf {
-    CollectionDetailsViewModel(PreviewCollectionRepository)
+    CollectionDetailsViewModel(PreviewRepository)
 }
 
 @ExperimentalAnimatedInsets
@@ -86,7 +86,7 @@ fun CollectionDetailScreen(
                         }
                     }
                 })
-            val savedResult by viewModel.savedResult.collectAsState()
+            val savedResult by viewModel.savedRes.resultFlow.collectAsState()
             when (savedResult) {
                 is Result.Success -> {
                     LaunchedEffect(savedResult) {
@@ -211,7 +211,7 @@ private fun URLContent(collectionComplete: CollectionComplete) {
 @Composable
 fun CollectionDetailPreview() {
     CollectionDetailScreen(
-        CollectionDetailsViewModel(PreviewCollectionRepository),
+        CollectionDetailsViewModel(PreviewRepository),
         CollectionComplete(
             Collection(
                 type = CollectionType.Text,

@@ -20,9 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.google.accompanist.flowlayout.FlowRow
-import com.lijie.jiancang.data.db.entity.Label
-import com.lijie.jiancang.data.source.PreviewCollectionRepository
+import com.lijie.jiancang.db.entity.Label
 import com.lijie.jiancang.ext.toast
+import com.lijie.jiancang.repository.PreviewRepository
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.viewmodel.LabelManagerViewModel
@@ -30,7 +30,7 @@ import com.lijie.jiancang.viewmodel.LabelManagerViewModel
 object LabelManagerScreen : Screen("label_manager_screen")
 
 private val LocalLabelManagerViewModel = staticCompositionLocalOf {
-    LabelManagerViewModel(PreviewCollectionRepository)
+    LabelManagerViewModel(PreviewRepository)
 }
 
 @Composable
@@ -65,7 +65,7 @@ fun LabelManagerScreen(
             })
         }) {
             Column(modifier = Modifier.padding(16.dp)) {
-                val labels by viewModel.labels.collectAsState()
+                val labels by viewModel.labelsRes.dataFlow.collectAsState()
                 LabelManagerFlow(labels)
                 LaunchedEffect(Unit) {
                     viewModel.queryLabel()
@@ -165,7 +165,7 @@ fun AddLabelDialog(onCancel: () -> Unit, onConfirm: (String) -> Unit) {
 @Preview
 @Composable
 fun LabelManagerPreview() {
-    LabelManagerScreen(LabelManagerViewModel(PreviewCollectionRepository))
+    LabelManagerScreen(LabelManagerViewModel(PreviewRepository))
 }
 
 @Preview

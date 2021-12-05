@@ -1,46 +1,35 @@
 package com.lijie.jiancang.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.lijie.jiancang.data.Result
-import com.lijie.jiancang.data.db.entity.CollectionComplete
-import com.lijie.jiancang.data.source.ICollectionRepository
+import com.lijie.jiancang.db.entity.CollectionComplete
+import com.lijie.jiancang.ext.launch
+import com.lijie.jiancang.repository.IRepository
+import com.lijie.jiancang.repository.ResFlow
+import com.lijie.jiancang.repository.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val repository: ICollectionRepository
+    private val repository: IRepository
 ) : ViewModel() {
 
-    private val _collectionsLoading =
-        MutableStateFlow<Result<List<CollectionComplete>>>(Result.Success(listOf()))
-    private val _collections = MutableStateFlow<List<CollectionComplete>>(listOf())
-    val collectionsLoading = _collectionsLoading.asStateFlow()
-    val collections = _collections.asStateFlow()
+    val collectionsRes = ResFlow<List<CollectionComplete>>(listOf())
+    val deleteCollectionRes = ResFlow(false)
 
     fun queryCollections() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _collectionsLoading.value = Result.Loading
-            val result = repository.getAllCollection()
-            if (result is Result.Success) {
-                _collections.value = result.data
-            }
-            _collectionsLoading.value = result
+        launch(collectionsRes) {
+            repository.getAllCollection()
         }
     }
 
     fun deleteCollection(collectionComplete: CollectionComplete) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _collectionsLoading.value = Result.Loading
+        launch(deleteCollectionRes) {
             val deleteResult = repository.deleteCollection(collectionComplete)
             if (deleteResult is Result.Success) {
                 queryCollections()
             }
+            deleteResult
         }
     }
 

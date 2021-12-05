@@ -1,16 +1,15 @@
-package com.lijie.jiancang.data.source
+package com.lijie.jiancang.repository
 
 import android.net.Uri
-import com.lijie.jiancang.data.Result
-import com.lijie.jiancang.data.db.AppDatabase
-import com.lijie.jiancang.data.db.entity.*
-import com.lijie.jiancang.data.db.entity.Collection
+import com.lijie.jiancang.db.AppDatabase
+import com.lijie.jiancang.db.entity.*
+import com.lijie.jiancang.db.entity.Collection
 import com.lijie.jiancang.ext.saveImage
 import com.lijie.jiancang.ext.saveMarkdown
 import okio.IOException
 import java.io.File
 
-interface ICollectionRepository {
+interface IRepository {
 
     suspend fun getAllCollection(): Result<List<CollectionComplete>>
 
@@ -31,9 +30,9 @@ interface ICollectionRepository {
 
 }
 
-class CollectionRepository(
+class Repository(
     private val db: AppDatabase
-) : ICollectionRepository {
+) : IRepository {
 
     override suspend fun getAllCollection(): Result<List<CollectionComplete>> {
         return try {
@@ -171,7 +170,7 @@ class CollectionRepository(
 
 }
 
-object PreviewCollectionRepository : ICollectionRepository {
+object PreviewRepository : IRepository {
 
     override suspend fun getAllCollection(): Result<List<CollectionComplete>> {
         return Result.Success(

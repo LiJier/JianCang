@@ -1,4 +1,4 @@
-package com.lijie.jiancang.data
+package com.lijie.jiancang.repository
 
 sealed class Result<out R> {
 

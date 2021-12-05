@@ -1,4 +1,4 @@
-package com.lijie.jiancang.data.db.entity
+package com.lijie.jiancang.db.entity
 
 import androidx.room.Entity
 import androidx.room.Ignore

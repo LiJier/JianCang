@@ -21,10 +21,10 @@ import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.flowlayout.FlowRow
 import com.lijie.jiancang.R
-import com.lijie.jiancang.data.db.entity.CollectionComplete
-import com.lijie.jiancang.data.db.entity.CollectionType
-import com.lijie.jiancang.data.source.PreviewCollectionRepository
+import com.lijie.jiancang.db.entity.CollectionComplete
+import com.lijie.jiancang.db.entity.CollectionType
 import com.lijie.jiancang.ext.toTime
+import com.lijie.jiancang.repository.PreviewRepository
 import com.lijie.jiancang.ui.compose.AutoLinkText
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.theme.Shapes
@@ -34,7 +34,7 @@ import java.io.File
 object MainScreen : Screen("main_screen")
 
 private val LocalMainViewModel = staticCompositionLocalOf {
-    MainViewModel(PreviewCollectionRepository)
+    MainViewModel(PreviewRepository)
 }
 
 @ExperimentalMaterialApi
@@ -66,7 +66,7 @@ fun MainScreen(
                 onDrawerItemClick(it)
             }
         }, scaffoldState = rememberScaffoldState(drawerState)) {
-            val collections by viewModel.collections.collectAsState()
+            val collections by viewModel.collectionsRes.dataFlow.collectAsState()
             LazyColumn(modifier = Modifier.padding(8.dp)) {
                 items(collections) {
                     CollectionItem(it, onItemClick)
@@ -170,7 +170,7 @@ fun CollectionItem(
 @Preview
 @Composable
 fun MainPreview() {
-    MainScreen(MainViewModel(PreviewCollectionRepository), {}) {}
+    MainScreen(MainViewModel(PreviewRepository), {}) {}
 }
 
 

@@ -1,9 +1,9 @@
-package com.lijie.jiancang.data.db.dao
+package com.lijie.jiancang.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.lijie.jiancang.data.db.entity.LabelQuote
+import com.lijie.jiancang.db.entity.LabelQuote
 
 @Dao
 interface LabelQuoteDao : IDao<LabelQuote> {

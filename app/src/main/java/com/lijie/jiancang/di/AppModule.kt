@@ -2,9 +2,9 @@ package com.lijie.jiancang.di
 
 import android.content.Context
 import androidx.room.Room
-import com.lijie.jiancang.data.db.AppDatabase
-import com.lijie.jiancang.data.source.CollectionRepository
-import com.lijie.jiancang.data.source.ICollectionRepository
+import com.lijie.jiancang.db.AppDatabase
+import com.lijie.jiancang.repository.Repository
+import com.lijie.jiancang.repository.IRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,8 +20,8 @@ object AppModule {
     @Provides
     fun provideCollectionRepository(
         db: AppDatabase
-    ): ICollectionRepository {
-        return CollectionRepository(db)
+    ): IRepository {
+        return Repository(db)
     }
 
     @Singleton

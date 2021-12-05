@@ -1,22 +1,18 @@
 package com.lijie.jiancang.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.lijie.jiancang.data.Result
-import com.lijie.jiancang.data.db.entity.Collection
-import com.lijie.jiancang.data.db.entity.CollectionType
-import com.lijie.jiancang.data.db.entity.Label
-import com.lijie.jiancang.data.source.ICollectionRepository
+import com.lijie.jiancang.db.entity.Collection
+import com.lijie.jiancang.db.entity.CollectionType
+import com.lijie.jiancang.db.entity.Label
+import com.lijie.jiancang.ext.launch
+import com.lijie.jiancang.repository.IRepository
+import com.lijie.jiancang.repository.ResFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AddCollectionViewModel @Inject constructor(
-    private val repository: ICollectionRepository
+    private val repository: IRepository
 ) : ViewModel() {
 
     private val collection = Collection(
@@ -27,13 +23,8 @@ class AddCollectionViewModel @Inject constructor(
         idea = "",
     )
 
-    private val _labelsResult = MutableStateFlow<Result<List<Label>>>(Result.Success(listOf()))
-    private val _labels = MutableStateFlow<List<Label>>(listOf())
-    val labelsResult = _labelsResult.asStateFlow()
-    val labels = _labels.asStateFlow()
-
-    private val _savedResult = MutableStateFlow<Result<Boolean>>(Result.Success(false))
-    val savedResult = _savedResult.asStateFlow()
+    val labelsRes = ResFlow<List<Label>>(listOf())
+    val savedRes = ResFlow(false)
 
     fun setType(type: CollectionType) {
         collection.type = type
@@ -56,20 +47,14 @@ class AddCollectionViewModel @Inject constructor(
     }
 
     fun queryLabel() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _labelsResult.value = Result.Loading
-            val result = repository.getAllLabels()
-            if (result is Result.Success) {
-                _labels.value = result.data
-            }
-            _labelsResult.value = result
+        launch(labelsRes) {
+            repository.getAllLabels()
         }
     }
 
     fun saveCollection() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _savedResult.value = Result.Loading
-            _savedResult.value = repository.saveCollection(collection, labels.value)
+        launch(savedRes) {
+            repository.saveCollection(collection, labelsRes.dataFlow.value)
         }
     }
 
