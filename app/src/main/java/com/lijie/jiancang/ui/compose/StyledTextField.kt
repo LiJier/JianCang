@@ -16,7 +16,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.lijie.jiancang.screen.LocalViewModel
+import com.lijie.jiancang.ui.theme.theme
 
 @Composable
 fun StyledTextField(
@@ -33,7 +33,7 @@ fun StyledTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    cursorBrush: Brush = SolidColor(LocalViewModel.current.theme.value.primary),
+    cursorBrush: Brush = SolidColor(theme.primary),
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
 ) {

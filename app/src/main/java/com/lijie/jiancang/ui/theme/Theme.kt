@@ -5,12 +5,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.lijie.jiancang.screen.LocalViewModel
 
 val DarkColorPalette = darkColors(
     primary = Purple200,
@@ -33,14 +33,14 @@ val LightColorPalette = lightColors(
     */
 )
 
+var theme by mutableStateOf(LightColorPalette)
+
 @Composable
 fun JianCangTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val localViewModel = LocalViewModel.current
-    val theme by localViewModel.theme.collectAsState()
-    if (darkTheme) {
-        localViewModel.setTheme(DarkColorPalette)
+    theme = if (darkTheme) {
+        DarkColorPalette
     } else {
-        localViewModel.setTheme(LightColorPalette)
+        LightColorPalette
     }
     ProvideWindowInsets {
         rememberSystemUiController().setStatusBarColor(Color.Transparent)

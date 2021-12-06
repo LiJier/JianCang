@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
@@ -28,53 +29,48 @@ import com.lijie.jiancang.repository.PreviewRepository
 import com.lijie.jiancang.ui.compose.AutoLinkText
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.theme.Shapes
+import com.lijie.jiancang.ui.theme.theme
 import com.lijie.jiancang.viewmodel.MainViewModel
 import java.io.File
 
 object MainScreen : Screen("main_screen")
 
-private val LocalMainViewModel = staticCompositionLocalOf {
-    MainViewModel(PreviewRepository)
-}
-
 @ExperimentalMaterialApi
 @ExperimentalCoilApi
 @Composable
 fun MainScreen(
-    viewModel: MainViewModel,
+    viewModel: MainViewModel = hiltViewModel(),
     onItemClick: (CollectionComplete) -> Unit,
     onDrawerItemClick: (String) -> Unit
 ) {
-    CompositionLocalProvider(LocalMainViewModel provides viewModel) {
-        val context = LocalContext.current
-        var drawerStateValue by remember { mutableStateOf(DrawerValue.Closed) }
-        val drawerState = rememberDrawerState(initialValue = drawerStateValue)
-        LaunchedEffect(drawerStateValue) {
-            if (drawerStateValue == DrawerValue.Closed) {
-                drawerState.close()
-            } else {
-                drawerState.open()
+    val context = LocalContext.current
+    var drawerStateValue by remember { mutableStateOf(DrawerValue.Closed) }
+    val drawerState = rememberDrawerState(initialValue = drawerStateValue)
+    LaunchedEffect(drawerStateValue) {
+        if (drawerStateValue == DrawerValue.Closed) {
+            drawerState.close()
+        } else {
+            drawerState.open()
+        }
+    }
+    Screen(topBar = {
+        TopAppBar(
+            title = { Text(text = context.getString(R.string.app_name)) }
+        )
+    }, drawerContent = {
+        MainDrawerContent {
+            drawerStateValue = DrawerValue.Closed
+            onDrawerItemClick(it)
+        }
+    }, scaffoldState = rememberScaffoldState(drawerState)) {
+        val collections by viewModel.collectionsRes.dataFlow.collectAsState()
+        LazyColumn(modifier = Modifier.padding(8.dp)) {
+            items(collections) {
+                CollectionItem(viewModel, it, onItemClick)
             }
         }
-        Screen(topBar = {
-            TopAppBar(
-                title = { Text(text = context.getString(R.string.app_name)) }
-            )
-        }, drawerContent = {
-            MainDrawerContent {
-                drawerStateValue = DrawerValue.Closed
-                onDrawerItemClick(it)
-            }
-        }, scaffoldState = rememberScaffoldState(drawerState)) {
-            val collections by viewModel.collectionsRes.dataFlow.collectAsState()
-            LazyColumn(modifier = Modifier.padding(8.dp)) {
-                items(collections) {
-                    CollectionItem(it, onItemClick)
-                }
-            }
-            LaunchedEffect(Unit) {
-                viewModel.queryCollections()
-            }
+        LaunchedEffect(Unit) {
+            viewModel.queryCollections()
         }
     }
 }
@@ -82,11 +78,10 @@ fun MainScreen(
 @ExperimentalCoilApi
 @Composable
 fun CollectionItem(
+    viewModel: MainViewModel,
     collectionComplete: CollectionComplete,
     onItemClick: (CollectionComplete) -> Unit
 ) {
-    val theme by LocalViewModel.current.theme.collectAsState()
-    val viewModel = LocalMainViewModel.current
     Box(
         modifier = Modifier
             .fillMaxWidth()

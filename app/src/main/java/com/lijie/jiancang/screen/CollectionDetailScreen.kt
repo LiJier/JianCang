@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
@@ -40,113 +41,108 @@ import java.io.File
 
 object CollectionDetailScreen : Screen("collection_detail_screen")
 
-private val LocalCollectionDetailsViewModel = staticCompositionLocalOf {
-    CollectionDetailsViewModel(PreviewRepository)
-}
-
 @ExperimentalAnimatedInsets
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @ExperimentalUnitApi
 @Composable
 fun CollectionDetailScreen(
-    viewModel: CollectionDetailsViewModel,
+    viewModel: CollectionDetailsViewModel = hiltViewModel(),
     collectionComplete: CollectionComplete
 ) {
-    CompositionLocalProvider(
-        LocalCollectionDetailsViewModel provides viewModel
-    ) {
-        val onBackPressedDispatcher =
-            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-        viewModel.setCollectionComplete(collectionComplete)
-        var isEdit by remember { mutableStateOf(false) }
-        Screen(topBar = {
-            TopAppBar(title = { Text(text = collectionComplete.collection.title ?: "") },
-                navigationIcon = {
+    val onBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    viewModel.setCollectionComplete(collectionComplete)
+    var isEdit by remember { mutableStateOf(false) }
+    Screen(topBar = {
+        TopAppBar(title = { Text(text = collectionComplete.collection.title ?: "") },
+            navigationIcon = {
+                IconButton(onClick = {
+                    onBackPressedDispatcher?.onBackPressed()
+                }) {
+                    Icon(Icons.Default.Close, contentDescription = "关闭")
+                }
+            },
+            actions = {
+                val type = collectionComplete.collection.type
+                if (type == CollectionType.Text || type == CollectionType.MD) {
                     IconButton(onClick = {
-                        onBackPressedDispatcher?.onBackPressed()
+                        isEdit = isEdit.not()
                     }) {
-                        Icon(Icons.Default.Close, contentDescription = "关闭")
+                        Icon(Icons.Default.Edit, contentDescription = "编辑")
                     }
-                },
-                actions = {
-                    val type = collectionComplete.collection.type
-                    if (type == CollectionType.Text || type == CollectionType.MD) {
+                    if (isEdit) {
                         IconButton(onClick = {
-                            isEdit = isEdit.not()
+                            viewModel.save()
                         }) {
-                            Icon(Icons.Default.Edit, contentDescription = "编辑")
-                        }
-                        if (isEdit) {
-                            IconButton(onClick = {
-                                viewModel.save()
-                            }) {
-                                Icon(Icons.Default.Done, contentDescription = "保存")
-                            }
-                        }
-                    }
-                })
-            val savedResult by viewModel.savedRes.resultFlow.collectAsState()
-            when (savedResult) {
-                is Result.Success -> {
-                    LaunchedEffect(savedResult) {
-                        if ((savedResult as Result.Success<Boolean>).data) {
-                            "保存成功".toast()
-                            onBackPressedDispatcher?.onBackPressed()
+                            Icon(Icons.Default.Done, contentDescription = "保存")
                         }
                     }
                 }
-                is Result.Error -> {
-                    LaunchedEffect(savedResult) {
-                        "保存失败".toast()
+            })
+        val savedResult by viewModel.savedRes.resultFlow.collectAsState()
+        when (savedResult) {
+            is Result.Success -> {
+                LaunchedEffect(savedResult) {
+                    if ((savedResult as Result.Success<Boolean>).data) {
+                        "保存成功".toast()
+                        onBackPressedDispatcher?.onBackPressed()
                     }
-                }
-                is Result.Loading -> {
-                    ProgressDialog(onDismissRequest = { })
                 }
             }
-        }, modifier = Modifier.fillMaxSize()) {
-            var height by remember { mutableStateOf(0) }
+            is Result.Error -> {
+                LaunchedEffect(savedResult) {
+                    "保存失败".toast()
+                }
+            }
+            is Result.Loading -> {
+                ProgressDialog(onDismissRequest = { })
+            }
+        }
+    }, modifier = Modifier.fillMaxSize()) {
+        var height by remember { mutableStateOf(0) }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .onSizeChanged { height = it.height }
+        ) {
+            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .onSizeChanged { height = it.height }
+                    .fillMaxWidth()
+                    .weight(1F)
+                    .padding(8.dp)
+                    .imeScroll(height, scrollState)
             ) {
-                val scrollState = rememberScrollState()
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1F)
-                        .padding(8.dp)
-                        .imeScroll(height, scrollState)
-                ) {
-                    when (collectionComplete.collection.type) {
-                        CollectionType.Image -> {
-                            ImageContent(collectionComplete = collectionComplete)
-                        }
-                        CollectionType.MD -> {
-                            val mdString =
-                                File(collectionComplete.collection.content).readText()
-                            viewModel.setNewContent(mdString)
-                            MDContent(mdString, isEdit)
-                        }
-                        CollectionType.Text -> {
-                            TextContent(collectionComplete = collectionComplete, isEdit)
-                        }
-                        CollectionType.URL -> {
-                            URLContent(collectionComplete = collectionComplete)
-                        }
+                when (collectionComplete.collection.type) {
+                    CollectionType.Image -> {
+                        ImageContent(collectionComplete = collectionComplete)
+                    }
+                    CollectionType.MD -> {
+                        val mdString =
+                            File(collectionComplete.collection.content).readText()
+                        viewModel.setNewContent(mdString)
+                        MDContent(viewModel, mdString, isEdit)
+                    }
+                    CollectionType.Text -> {
+                        TextContent(viewModel, collectionComplete, isEdit)
+                    }
+                    CollectionType.URL -> {
+                        URLContent(collectionComplete = collectionComplete)
                     }
                 }
-                Spacer(modifier = Modifier.imeHeight())
             }
+            Spacer(modifier = Modifier.imeHeight())
         }
     }
 }
 
 @Composable
-private fun TextContent(collectionComplete: CollectionComplete, isEdit: Boolean) {
-    val viewModel = LocalCollectionDetailsViewModel.current
+private fun TextContent(
+    viewModel: CollectionDetailsViewModel,
+    collectionComplete: CollectionComplete,
+    isEdit: Boolean
+) {
     if (isEdit) {
         var text by remember { mutableStateOf(collectionComplete.collection.content) }
         OutlinedTextField(
@@ -175,8 +171,7 @@ private fun ImageContent(collectionComplete: CollectionComplete) {
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 @Composable
-private fun MDContent(mdString: String, isEdit: Boolean) {
-    val viewModel = LocalCollectionDetailsViewModel.current
+private fun MDContent(viewModel: CollectionDetailsViewModel, mdString: String, isEdit: Boolean) {
     if (isEdit) {
         var text by remember { mutableStateOf(TextFieldValue(mdString)) }
         val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }

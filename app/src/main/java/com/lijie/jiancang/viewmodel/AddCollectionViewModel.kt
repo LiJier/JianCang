@@ -1,19 +1,15 @@
 package com.lijie.jiancang.viewmodel
 
-import androidx.lifecycle.ViewModel
 import com.lijie.jiancang.db.entity.Collection
 import com.lijie.jiancang.db.entity.CollectionType
 import com.lijie.jiancang.db.entity.Label
-import com.lijie.jiancang.ext.launch
 import com.lijie.jiancang.repository.IRepository
-import com.lijie.jiancang.repository.ResFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class AddCollectionViewModel @Inject constructor(
-    private val repository: IRepository
-) : ViewModel() {
+class AddCollectionViewModel @Inject constructor(repository: IRepository) :
+    BaseViewModel(repository) {
 
     private val collection = Collection(
         type = CollectionType.Text,
@@ -48,13 +44,13 @@ class AddCollectionViewModel @Inject constructor(
 
     fun queryLabel() {
         launch(labelsRes) {
-            repository.getAllLabels()
+            getAllLabels()
         }
     }
 
     fun saveCollection() {
         launch(savedRes) {
-            repository.saveCollection(collection, labelsRes.dataFlow.value)
+            saveCollection(collection, labelsRes.dataFlow.value)
         }
     }
 

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
@@ -32,134 +33,128 @@ import com.lijie.jiancang.ui.compose.ProgressDialog
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.compose.WebView
 import com.lijie.jiancang.ui.theme.Shapes
+import com.lijie.jiancang.ui.theme.theme
 import com.lijie.jiancang.viewmodel.AddCollectionViewModel
 import com.overzealous.remark.Remark
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 object AddCollectionScreen : Screen("add_collection_screen")
 
-private val LocalAddCollectionViewModel = staticCompositionLocalOf {
-    AddCollectionViewModel(PreviewRepository)
-}
-
 @ExperimentalUnitApi
 @SuppressLint("SetJavaScriptEnabled")
 @ExperimentalCoilApi
 @Composable
 fun AddCollectionScreen(
-    viewModel: AddCollectionViewModel,
+    viewModel: AddCollectionViewModel = hiltViewModel(),
     content: String = "内容",
     type: CollectionType = CollectionType.Text
 ) {
-    CompositionLocalProvider(LocalAddCollectionViewModel provides viewModel) {
-        viewModel.setOriginal(content)
-        val onBackPressedDispatcher =
-            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-        Screen(topBar = {
-            TopAppBar(
-                title = { Text(text = "添加") },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        onBackPressedDispatcher?.onBackPressed()
-                    }) {
-                        Icon(Icons.Default.Close, contentDescription = "关闭")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.saveCollection()
-                    }) {
-                        Icon(Icons.Default.Done, contentDescription = "保存")
-                    }
+    viewModel.setOriginal(content)
+    val onBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    Screen(topBar = {
+        TopAppBar(
+            title = { Text(text = "添加") },
+            navigationIcon = {
+                IconButton(onClick = {
+                    onBackPressedDispatcher?.onBackPressed()
+                }) {
+                    Icon(Icons.Default.Close, contentDescription = "关闭")
                 }
-            )
-            val savedResult by viewModel.savedRes.resultFlow.collectAsState()
-            when (savedResult) {
-                is Result.Success -> {
-                    LaunchedEffect(savedResult) {
-                        if ((savedResult as Result.Success<Boolean>).data) {
-                            "保存成功".toast()
-                            onBackPressedDispatcher?.onBackPressed()
-                        }
-                    }
-                }
-                is Result.Error -> {
-                    LaunchedEffect(savedResult) {
-                        "保存失败".toast()
-                    }
-                }
-                is Result.Loading -> {
-                    ProgressDialog(onDismissRequest = { })
+            },
+            actions = {
+                IconButton(onClick = {
+                    viewModel.saveCollection()
+                }) {
+                    Icon(Icons.Default.Done, contentDescription = "保存")
                 }
             }
-        }) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                var editTitle by remember {
-                    mutableStateOf(
-                        content.substring(0, if (content.length > 6) 6 else content.length)
+        )
+        val savedResult by viewModel.savedRes.resultFlow.collectAsState()
+        when (savedResult) {
+            is Result.Success -> {
+                LaunchedEffect(savedResult) {
+                    if ((savedResult as Result.Success<Boolean>).data) {
+                        "保存成功".toast()
+                        onBackPressedDispatcher?.onBackPressed()
+                    }
+                }
+            }
+            is Result.Error -> {
+                LaunchedEffect(savedResult) {
+                    "保存失败".toast()
+                }
+            }
+            is Result.Loading -> {
+                ProgressDialog(onDismissRequest = { })
+            }
+        }
+    }) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            var editTitle by remember {
+                mutableStateOf(
+                    content.substring(0, if (content.length > 6) 6 else content.length)
+                )
+            }
+            viewModel.setTitle(editTitle)
+            Text(text = "标题", modifier = Modifier.padding(vertical = 8.dp))
+            OutlinedTextField(
+                value = editTitle,
+                onValueChange = {
+                    editTitle = it
+                    viewModel.setTitle(editTitle)
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(text = "内容", modifier = Modifier.padding(vertical = 8.dp))
+            if (type == CollectionType.Text) {
+                TextType(viewModel, content) { title, _ ->
+                    editTitle = title
+                    viewModel.setTitle(editTitle)
+                }
+            } else if (type == CollectionType.Image) {
+                viewModel.setType(type)
+                ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+                    Image(
+                        painter = rememberImagePainter(data = content) {
+                            size(OriginalSize)
+                        },
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .constrainAs(createRef()) {
+                                start.linkTo(parent.start)
+                                width = Dimension.percent(0.5F)
+                            }
+                            .aspectRatio(1F)
                     )
                 }
-                viewModel.setTitle(editTitle)
-                Text(text = "标题", modifier = Modifier.padding(vertical = 8.dp))
-                OutlinedTextField(
-                    value = editTitle,
-                    onValueChange = {
-                        editTitle = it
-                        viewModel.setTitle(editTitle)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(text = "内容", modifier = Modifier.padding(vertical = 8.dp))
-                if (type == CollectionType.Text) {
-                    TextType(content) { title, _ ->
-                        editTitle = title
-                        viewModel.setTitle(editTitle)
-                    }
-                } else if (type == CollectionType.Image) {
-                    viewModel.setType(type)
-                    ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-                        Image(
-                            painter = rememberImagePainter(data = content) {
-                                size(OriginalSize)
-                            },
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .constrainAs(createRef()) {
-                                    start.linkTo(parent.start)
-                                    width = Dimension.percent(0.5F)
-                                }
-                                .aspectRatio(1F)
-                        )
-                    }
-                }
-                Text(text = "标签", modifier = Modifier.padding(vertical = 8.dp))
-                val labels by viewModel.labelsRes.dataFlow.collectAsState()
-                LabelsFlow(labels)
-                LaunchedEffect(Unit) { viewModel.queryLabel() }
-                Text(text = "想法", modifier = Modifier.padding(vertical = 8.dp))
-                var idea by remember { mutableStateOf("") }
-                OutlinedTextField(
-                    value = idea,
-                    onValueChange = { s ->
-                        idea = s
-                        viewModel.setIdea(idea)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
+            Text(text = "标签", modifier = Modifier.padding(vertical = 8.dp))
+            val labels by viewModel.labelsRes.dataFlow.collectAsState()
+            LabelsFlow(labels)
+            LaunchedEffect(Unit) { viewModel.queryLabel() }
+            Text(text = "想法", modifier = Modifier.padding(vertical = 8.dp))
+            var idea by remember { mutableStateOf("") }
+            OutlinedTextField(
+                value = idea,
+                onValueChange = { s ->
+                    idea = s
+                    viewModel.setIdea(idea)
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
 
 @Composable
 fun LabelsFlow(labels: List<Label>) {
-    val theme by LocalViewModel.current.theme.collectAsState()
     FlowRow(mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
         labels.forEach { label ->
             var check by remember { mutableStateOf(label.check) }
@@ -183,8 +178,11 @@ fun LabelsFlow(labels: List<Label>) {
 
 @ExperimentalUnitApi
 @Composable
-fun TextType(content: String, onLoadComplete: (String, String) -> Unit) {
-    val viewModel = LocalAddCollectionViewModel.current
+fun TextType(
+    viewModel: AddCollectionViewModel,
+    content: String,
+    onLoadComplete: (String, String) -> Unit
+) {
     val url by remember { mutableStateOf(content.findUrl().orEmpty()) }
     var type by remember {
         mutableStateOf(

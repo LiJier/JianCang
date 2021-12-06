@@ -19,66 +19,60 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.flowlayout.FlowRow
 import com.lijie.jiancang.db.entity.Label
 import com.lijie.jiancang.ext.toast
 import com.lijie.jiancang.repository.PreviewRepository
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.theme.Shapes
+import com.lijie.jiancang.ui.theme.theme
 import com.lijie.jiancang.viewmodel.LabelManagerViewModel
 
 object LabelManagerScreen : Screen("label_manager_screen")
 
-private val LocalLabelManagerViewModel = staticCompositionLocalOf {
-    LabelManagerViewModel(PreviewRepository)
-}
-
 @Composable
 fun LabelManagerScreen(
-    viewModel: LabelManagerViewModel
+    viewModel: LabelManagerViewModel = hiltViewModel()
 ) {
-    CompositionLocalProvider(LocalLabelManagerViewModel provides viewModel) {
-        val onBackPressedDispatcher =
-            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-        Screen(topBar = {
-            TopAppBar(title = { Text(text = "标签管理") }, navigationIcon = {
-                IconButton(onClick = {
-                    onBackPressedDispatcher?.onBackPressed()
-                }) {
-                    Icon(Icons.Default.Close, contentDescription = "关闭")
+    val onBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    Screen(topBar = {
+        TopAppBar(title = { Text(text = "标签管理") }, navigationIcon = {
+            IconButton(onClick = {
+                onBackPressedDispatcher?.onBackPressed()
+            }) {
+                Icon(Icons.Default.Close, contentDescription = "关闭")
+            }
+        }, actions = {
+            var showAddLabelDialog by remember { mutableStateOf(false) }
+            if (showAddLabelDialog) {
+                Dialog(onDismissRequest = { showAddLabelDialog = false }) {
+                    AddLabelDialog(onCancel = { showAddLabelDialog = false }, onConfirm = {
+                        showAddLabelDialog = false
+                        viewModel.addLabel(it)
+                    })
                 }
-            }, actions = {
-                var showAddLabelDialog by remember { mutableStateOf(false) }
-                if (showAddLabelDialog) {
-                    Dialog(onDismissRequest = { showAddLabelDialog = false }) {
-                        AddLabelDialog(onCancel = { showAddLabelDialog = false }, onConfirm = {
-                            showAddLabelDialog = false
-                            viewModel.addLabel(it)
-                        })
-                    }
-                }
-                IconButton(onClick = {
-                    showAddLabelDialog = true
-                }) {
-                    Icon(Icons.Default.Add, contentDescription = "添加")
-                }
-            })
-        }) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                val labels by viewModel.labelsRes.dataFlow.collectAsState()
-                LabelManagerFlow(labels)
-                LaunchedEffect(Unit) {
-                    viewModel.queryLabel()
-                }
+            }
+            IconButton(onClick = {
+                showAddLabelDialog = true
+            }) {
+                Icon(Icons.Default.Add, contentDescription = "添加")
+            }
+        })
+    }) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            val labels by viewModel.labelsRes.dataFlow.collectAsState()
+            LabelManagerFlow(viewModel, labels)
+            LaunchedEffect(Unit) {
+                viewModel.queryLabel()
             }
         }
     }
 }
 
 @Composable
-fun LabelManagerFlow(labels: List<Label>) {
-    val viewModel = LocalLabelManagerViewModel.current
-    val theme by LocalViewModel.current.theme.collectAsState()
+fun LabelManagerFlow(viewModel: LabelManagerViewModel, labels: List<Label>) {
     FlowRow(mainAxisSpacing = 8.dp, crossAxisSpacing = 8.dp) {
         labels.forEach { label ->
             Text(
@@ -108,7 +102,6 @@ fun AddLabelDialog(onCancel: () -> Unit, onConfirm: (String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.background(color = Color.White, shape = Shapes.medium)
     ) {
-        val theme by LocalViewModel.current.theme.collectAsState()
         var labelName by remember { mutableStateOf("") }
         val textStyle = LocalTextStyle.current.merge(
             TextStyle(

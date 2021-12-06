@@ -1,18 +1,14 @@
 package com.lijie.jiancang.viewmodel
 
-import androidx.lifecycle.ViewModel
 import com.lijie.jiancang.db.entity.CollectionComplete
 import com.lijie.jiancang.db.entity.CollectionType
-import com.lijie.jiancang.ext.launch
 import com.lijie.jiancang.repository.IRepository
-import com.lijie.jiancang.repository.ResFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class CollectionDetailsViewModel @Inject constructor(
-    private val repository: IRepository
-) : ViewModel() {
+class CollectionDetailsViewModel @Inject constructor(repository: IRepository) :
+    BaseViewModel(repository) {
 
     private lateinit var collectionComplete: CollectionComplete
     private var mdContent: String = ""
@@ -33,7 +29,7 @@ class CollectionDetailsViewModel @Inject constructor(
 
     fun save() {
         launch(savedRes) {
-            repository.updateCollection(collectionComplete, mdContent)
+            updateCollection(collectionComplete, mdContent)
         }
     }
 

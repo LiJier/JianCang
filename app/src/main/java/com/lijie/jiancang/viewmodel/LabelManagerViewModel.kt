@@ -1,18 +1,14 @@
 package com.lijie.jiancang.viewmodel
 
-import androidx.lifecycle.ViewModel
 import com.lijie.jiancang.db.entity.Label
-import com.lijie.jiancang.ext.launch
 import com.lijie.jiancang.repository.IRepository
-import com.lijie.jiancang.repository.ResFlow
 import com.lijie.jiancang.repository.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class LabelManagerViewModel @Inject constructor(
-    private val repository: IRepository
-) : ViewModel() {
+class LabelManagerViewModel @Inject constructor(repository: IRepository) :
+    BaseViewModel(repository) {
 
     val labelsRes = ResFlow<List<Label>>(listOf())
 
@@ -20,7 +16,7 @@ class LabelManagerViewModel @Inject constructor(
 
     fun queryLabel() {
         launch(labelsRes) {
-            repository.getAllLabels()
+            getAllLabels()
         }
     }
 
@@ -36,7 +32,7 @@ class LabelManagerViewModel @Inject constructor(
 
     fun deleteLabel(label: Label) {
         launch(addDeleteLabelRes) {
-            val result = repository.deleteLabel(label)
+            val result = deleteLabel(label)
             if (result is Result.Success) {
                 queryLabel()
             }
