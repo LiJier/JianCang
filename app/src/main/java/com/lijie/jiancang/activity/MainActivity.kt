@@ -14,14 +14,16 @@ import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.core.view.WindowCompat
 import coil.annotation.ExperimentalCoilApi
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.lijie.jiancang.db.entity.CollectionType
-import com.lijie.jiancang.screen.AddCollectionScreen
-import com.lijie.jiancang.screen.MainScreen
-import com.lijie.jiancang.screen.Navigation
+import com.lijie.jiancang.ui.screen.AddCollectionScreen
+import com.lijie.jiancang.ui.screen.MainNavigation
+import com.lijie.jiancang.ui.screen.Navigation
 import com.lijie.jiancang.ui.theme.JianCangTheme
 import com.permissionx.guolindev.PermissionX
 import dagger.hilt.android.AndroidEntryPoint
 
+@ExperimentalPagerApi
 @ExperimentalMaterialApi
 @ExperimentalAnimatedInsets
 @ExperimentalFoundationApi
@@ -79,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                     if (content.isEmpty()) {
                         setContent {
                             JianCangTheme {
-                                Navigation(startDestination = MainScreen.route)
+                                Navigation(startDestination = MainNavigation.route)
                             }
                         }
                     } else {
@@ -95,6 +97,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
     }
 
 }

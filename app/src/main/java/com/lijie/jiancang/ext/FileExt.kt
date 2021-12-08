@@ -18,9 +18,7 @@ private val markDownFolder by lazy {
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
-suspend fun saveImage(
-    uri: Uri
-): File? {
+suspend fun saveImage(uri: Uri): File? {
     return withContext(Dispatchers.IO) {
         imageFolder?.let { imageFolder ->
             var name = uri.pathSegments.last() ?: uri.toString()

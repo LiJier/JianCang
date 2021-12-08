@@ -28,6 +28,8 @@ interface IRepository {
 
     suspend fun deleteLabel(label: Label): Result<Boolean>
 
+    suspend fun getLabelCollections(labelId: Long): Result<List<CollectionComplete>>
+
 }
 
 class Repository(
@@ -168,6 +170,19 @@ class Repository(
         }
     }
 
+    override suspend fun getLabelCollections(labelId: Long): Result<List<CollectionComplete>> {
+        return try {
+            val allCollection = db.collectionDao().queryCollections()
+            Result.Success(allCollection.filter {
+                val labelQuotes = it.labelQuote
+                return@filter labelQuotes.find { it1 -> it1.labelId == labelId } != null
+            })
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
 }
 
 object PreviewRepository : IRepository {
@@ -233,6 +248,33 @@ object PreviewRepository : IRepository {
 
     override suspend fun deleteLabel(label: Label): Result<Boolean> {
         return Result.Success(true)
+    }
+
+    override suspend fun getLabelCollections(labelId: Long): Result<List<CollectionComplete>> {
+        return Result.Success(
+            listOf(
+                CollectionComplete(
+                    Collection(
+                        type = CollectionType.URL,
+                        original = "",
+                        title = "百度",
+                        content = "https://www.baidu.com/",
+                        createTime = System.currentTimeMillis()
+                    ),
+                    arrayListOf(LabelQuote(labelName = "电影"))
+                ),
+                CollectionComplete(
+                    Collection(
+                        type = CollectionType.Text,
+                        original = "",
+                        title = "标题",
+                        content = "预览",
+                        createTime = System.currentTimeMillis()
+                    ),
+                    arrayListOf(LabelQuote(labelName = "歌曲"))
+                )
+            )
+        )
     }
 
 }

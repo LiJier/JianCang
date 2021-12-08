@@ -1,4 +1,4 @@
-package com.lijie.jiancang.screen
+package com.lijie.jiancang.ui.screen
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.ExperimentalFoundationApi

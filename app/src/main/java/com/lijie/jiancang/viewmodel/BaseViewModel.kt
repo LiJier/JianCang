@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
-open class BaseViewModel constructor(val repository: IRepository) : ViewModel() {
+open class BaseViewModel constructor(protected val repository: IRepository) : ViewModel() {
 
     data class ResFlow<T>(val initData: T) {
 

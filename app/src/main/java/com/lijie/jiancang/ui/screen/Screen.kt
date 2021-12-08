@@ -1,4 +1,4 @@
-package com.lijie.jiancang.screen
+package com.lijie.jiancang.ui.screen
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues

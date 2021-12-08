@@ -1,4 +1,4 @@
-package com.lijie.jiancang.screen
+package com.lijie.jiancang.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,7 +22,7 @@ import com.lijie.jiancang.ui.theme.Purple200
 
 @ExperimentalMaterialApi
 @Composable
-fun MainDrawerContent(onDrawerItemClick: (String) -> Unit) {
+fun DrawerContent(onDrawerItemClick: (String) -> Unit) {
     Column {
         Image(
             painter = ColorPainter(Purple200),
@@ -56,5 +56,5 @@ fun MainDrawerContent(onDrawerItemClick: (String) -> Unit) {
 @Preview
 @Composable
 fun MainDrawerPreview() {
-    MainDrawerContent {}
+    DrawerContent {}
 }
