@@ -15,18 +15,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.annotation.ExperimentalCoilApi
+import com.lijie.jiancang.db.entity.CollectionComplete
 import com.lijie.jiancang.repository.PreviewRepository
+import com.lijie.jiancang.ui.compose.CollectionItem
 import com.lijie.jiancang.viewmodel.LabelCollectionViewModel
 
-object LabelCollectionScreen : Screen("label_collection_screen")
-
+@ExperimentalCoilApi
 @Composable
-fun LabelCollectionScreen(viewModel: LabelCollectionViewModel = hiltViewModel()) {
+fun LabelCollectionScreen(
+    viewModel: LabelCollectionViewModel = hiltViewModel(),
+    onCollectionItemClick: (CollectionComplete) -> Unit
+) {
     Row(Modifier.fillMaxSize()) {
         val labels by viewModel.labelsRes.dataFlow.collectAsState()
-        if (labels.isNotEmpty()) {
-            LaunchedEffect(labels) {
-                viewModel.queryLabelCollection(labels[0].id)
+        LaunchedEffect(Unit) {
+            viewModel.queryLabels()
+        }
+        LaunchedEffect(labels) {
+            if (viewModel.currentLabel == null && labels.isNotEmpty()) {
+                viewModel.currentLabel = labels[0]
+                viewModel.currentLabel?.let { viewModel.queryLabelCollection(it) }
             }
         }
         LazyColumn(Modifier.weight(0.2f)) {
@@ -34,24 +43,29 @@ fun LabelCollectionScreen(viewModel: LabelCollectionViewModel = hiltViewModel())
                 Text(text = it.name, modifier = Modifier
                     .padding(16.dp)
                     .clickable {
-                        viewModel.queryLabelCollection(it.id)
+                        viewModel.currentLabel = it
+                        viewModel.queryLabelCollection(it)
                     })
             }
         }
         val collectionCompletes by viewModel.collectionCompletesRes.dataFlow.collectAsState()
         LazyColumn(Modifier.weight(0.8f)) {
-            items(collectionCompletes) {
-                Text(text = it.collection.content, modifier = Modifier.padding(16.dp))
+            items(collectionCompletes, key = {
+                it.collection.id
+            }) {
+                CollectionItem(it, { it1 ->
+                    viewModel.deleteCollection(it1)
+                }, { it1 ->
+                    onCollectionItemClick(it1)
+                })
             }
-        }
-        LaunchedEffect(Unit) {
-            viewModel.queryLabels()
         }
     }
 }
 
+@ExperimentalCoilApi
 @Preview
 @Composable
 fun LabelCollectionPreview() {
-    LabelCollectionScreen(LabelCollectionViewModel(PreviewRepository))
+    LabelCollectionScreen(LabelCollectionViewModel(PreviewRepository)) {}
 }

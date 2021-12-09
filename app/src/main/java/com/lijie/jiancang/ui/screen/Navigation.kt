@@ -38,16 +38,16 @@ fun Navigation(
     Screen(topBar = {}) {
         AnimatedNavHost(navController = navController,
             startDestination = startDestination,
-            enterTransition = {
+            enterTransition = { _, _ ->
                 slideInHorizontally(initialOffsetX = { 1000 })
             },
-            exitTransition = {
+            exitTransition = { _, _ ->
                 slideOutHorizontally(targetOffsetX = { -1000 })
             },
-            popEnterTransition = {
+            popEnterTransition = { _, _ ->
                 slideInHorizontally(initialOffsetX = { -1000 })
             },
-            popExitTransition = {
+            popExitTransition = { _, _ ->
                 slideOutHorizontally(targetOffsetX = { 1000 })
             }) {
             composable(route = AddCollectionScreen.route) {

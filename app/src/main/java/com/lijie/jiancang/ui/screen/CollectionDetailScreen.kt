@@ -36,7 +36,6 @@ import com.lijie.jiancang.repository.PreviewRepository
 import com.lijie.jiancang.repository.Result
 import com.lijie.jiancang.ui.compose.*
 import com.lijie.jiancang.viewmodel.CollectionDetailsViewModel
-import dev.jeziellago.compose.markdowntext.MarkdownText
 import java.io.File
 
 object CollectionDetailScreen : Screen("collection_detail_screen")
@@ -188,7 +187,7 @@ private fun MDContent(viewModel: CollectionDetailsViewModel, mdString: String, i
                 layoutResult.value = it
             })
     } else {
-        MarkdownText(markdown = mdString)
+        Markdown(markdown = mdString)
     }
 }
 

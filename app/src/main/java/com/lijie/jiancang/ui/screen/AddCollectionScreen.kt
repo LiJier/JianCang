@@ -29,6 +29,7 @@ import com.lijie.jiancang.ext.findUrl
 import com.lijie.jiancang.ext.toast
 import com.lijie.jiancang.repository.PreviewRepository
 import com.lijie.jiancang.repository.Result
+import com.lijie.jiancang.ui.compose.Markdown
 import com.lijie.jiancang.ui.compose.ProgressDialog
 import com.lijie.jiancang.ui.compose.TopAppBar
 import com.lijie.jiancang.ui.compose.WebView
@@ -36,7 +37,6 @@ import com.lijie.jiancang.ui.theme.Shapes
 import com.lijie.jiancang.ui.theme.theme
 import com.lijie.jiancang.viewmodel.AddCollectionViewModel
 import com.overzealous.remark.Remark
-import dev.jeziellago.compose.markdowntext.MarkdownText
 
 object AddCollectionScreen : Screen("add_collection_screen")
 
@@ -218,7 +218,9 @@ fun TextType(
                 )
             }
             if (type == CollectionType.MD) {
-                MarkdownText(markdown = editContent)
+                Markdown(
+                    markdown = editContent
+                )
             } else {
                 OutlinedTextField(
                     value = editContent,

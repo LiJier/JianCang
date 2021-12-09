@@ -26,7 +26,7 @@ object MainNavigation : Screen("main_navigation")
 @Composable
 fun MainNavigation(
     onDrawerItemClick: (String) -> Unit,
-    onMainItemClick: (CollectionComplete) -> Unit
+    onCollectionItemClick: (CollectionComplete) -> Unit
 ) {
     val back = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -76,19 +76,17 @@ fun MainNavigation(
             onDrawerItemClick(it)
         }
     }, scaffoldState = rememberScaffoldState(drawerState), bottomBar = {
-        MainBottomBar(pagerState.currentPage) {
+        MainBottomBar(currentPage) {
             currentPage = it
         }
     }) {
         HorizontalPager(2, state = pagerState, contentPadding = it) { page ->
             when (page) {
                 0 -> {
-                    MainScreen(onItemClick = { it1 ->
-                        onMainItemClick(it1)
-                    })
+                    MainScreen(onItemClick = onCollectionItemClick)
                 }
                 1 -> {
-                    LabelCollectionScreen()
+                    LabelCollectionScreen(onCollectionItemClick = onCollectionItemClick)
                 }
             }
         }
