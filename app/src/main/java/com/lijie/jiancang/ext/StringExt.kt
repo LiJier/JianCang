@@ -1,6 +1,11 @@
 package com.lijie.jiancang.ext
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -61,6 +66,20 @@ fun String.annotationUrl(checkIndex: Int = -1): AnnotatedString =
             }
         }
     }
+
+fun String.findIntent(): List<Drawable> {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(this))
+    val pm = App.appContext.packageManager
+    val list = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+    val drawableList = arrayListOf<Drawable>()
+    list.forEach {
+        val packageName = it.activityInfo.packageName
+        val activityName = it.activityInfo.name
+        val drawable = pm.getActivityIcon(ComponentName.createRelative(packageName, activityName))
+        drawableList.add(drawable)
+    }
+    return drawableList
+}
 
 fun String.findUrl(): String? {
     val urlList = arrayListOf<String>()

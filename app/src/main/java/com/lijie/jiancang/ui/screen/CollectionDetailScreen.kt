@@ -158,12 +158,12 @@ private fun TextContent(
 @Composable
 private fun ImageContent(collectionComplete: CollectionComplete) {
     Image(
-        painter = rememberImagePainter(data = collectionComplete.collection.content) {
+        painter = rememberImagePainter(data = File(collectionComplete.collection.content)) {
             size(OriginalSize)
         },
         contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxWidth()
+        contentScale = ContentScale.Inside,
+        modifier = Modifier.fillMaxSize()
     )
 }
 

@@ -5,6 +5,7 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -68,7 +69,14 @@ fun MainNavigation(
     }
     Screen(topBar = {
         TopAppBar(
-            title = { Text(text = "简藏") }
+            title = { Text(text = "简藏") },
+            navigationIcon = {
+                IconButton(onClick = {
+                    drawerStateValue = DrawerValue.Open
+                }) {
+                    Icon(Icons.Default.Menu, contentDescription = "")
+                }
+            }
         )
     }, drawerContent = {
         DrawerContent {
