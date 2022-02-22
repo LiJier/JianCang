@@ -5,6 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
@@ -111,7 +112,7 @@ fun CollectionDetailScreen(
                     .fillMaxWidth()
                     .weight(1F)
                     .padding(8.dp)
-                    .imeScroll(height, scrollState)
+                    .verticalScroll(scrollState.imeScroll(height))
             ) {
                 when (collectionComplete.collection.type) {
                     CollectionType.Image -> {
@@ -131,7 +132,7 @@ fun CollectionDetailScreen(
                     }
                 }
             }
-            Spacer(modifier = Modifier.imeHeight())
+            Spacer(modifier = Modifier.height(imeHeight()))
         }
     }
 }
