@@ -179,7 +179,6 @@ private fun MDContent(viewModel: CollectionDetailsViewModel, mdString: String, i
             value = text,
             onValueChange = {
                 text = it
-                it.selection
                 viewModel.setNewContent(it.text)
                 val line = layoutResult.value?.getLineForOffset(it.selection.start) ?: 0
                 val top = layoutResult.value?.getLineTop(line) ?: 0F
