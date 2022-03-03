@@ -36,20 +36,22 @@ fun Navigation(
     val navController = rememberAnimatedNavController()
     val arguments = bundleOf()
     Screen(topBar = {}) {
-        AnimatedNavHost(navController = navController,
+        AnimatedNavHost(
+            navController = navController,
             startDestination = startDestination,
-            enterTransition = { _, _ ->
+            enterTransition = {
                 slideInHorizontally(initialOffsetX = { 1000 })
             },
-            exitTransition = { _, _ ->
+            exitTransition = {
                 slideOutHorizontally(targetOffsetX = { -1000 })
             },
-            popEnterTransition = { _, _ ->
+            popEnterTransition = {
                 slideInHorizontally(initialOffsetX = { -1000 })
             },
-            popExitTransition = { _, _ ->
+            popExitTransition = {
                 slideOutHorizontally(targetOffsetX = { 1000 })
-            }) {
+            }
+        ) {
             composable(route = AddCollectionScreen.route) {
                 AddCollectionScreen(content = collectionContent, type = collectionType)
             }
@@ -65,9 +67,7 @@ fun Navigation(
                 arguments.getParcelable<CollectionComplete>(
                     COLLECTION_COMPLETE_KEY
                 )?.let {
-                    CollectionDetailScreen(
-                        hiltViewModel(), it
-                    )
+                    CollectionDetailScreen(hiltViewModel(), it)
                 }
             }
             composable(route = LabelManagerScreen.route) {
